@@ -5,8 +5,120 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SkiSlopeMotionDetection"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Ski Slope Motion Detection" Height="720" Width="1280" Background="LightGray">
+    <DockPanel>
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top" FontSize="14">
+            <MenuItem Header="_Open" />
+            <MenuItem Header="_Export" />
+        </Menu>
+
+        <!-- Status bar -->
+        <StatusBar DockPanel.Dock="Bottom" MinHeight="25" Padding="20 0 20 0">
+            <StatusBarItem HorizontalAlignment="Right">
+                <ProgressBar Minimum="0" Maximum="100" MinWidth="250" MinHeight="20"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- Main window -->
+        <Grid TextElement.FontSize="14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Player section -->
+            <Grid Grid.Column="0" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Player -->
+                <Rectangle Grid.Row="0" Fill="DarkGray"/>
+                <MediaElement Name="videoControl" Grid.Row="0"/>
+                <Button Name="loadVideoButton" Content="Load video" Grid.Row="0" Width="100" Height="100" Opacity="0.5"/>
+
+                <!-- Panel below player -->
+                <Grid Grid.Row="1" Margin="0, 10, 0, 00">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Frame number -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" TextElement.FontSize="16">
+                        <Label Content="Frame:"/>
+                        <Label Name="currentFrameNumber" Content="999"/>
+                        <Label Content="/"/>
+                        <Label Name="maxFrameNumber" Content="999"/>
+                    </StackPanel>
+
+                    <!-- FPS counter -->
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" TextElement.FontSize="16">
+                        <Label Content="FPS:"/>
+                        <Label Name="fpsCounter" Content="999"/>
+                    </StackPanel>
+
+                    <!-- Refresh rate -->
+                    <GroupBox Header="Refresh rate" Grid.Row="1" Grid.Column="0" Margin="5 5 5 10">
+                        <StackPanel VerticalAlignment="Center">
+                            <RadioButton Name="processingTimeRefreshRadioButton"  Content="Processing Time" Margin="10 10 10 5"/>
+                            <RadioButton Name="realTimeRefreshRadioButton" Content="Real time" Margin="10 5 10 10"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- People marking -->
+                    <GroupBox Header="Movement marking" Grid.Row="1" Grid.Column="1" Margin="5 5 5 10">
+                        <StackPanel VerticalAlignment="Center">
+                            <RadioButton Name="markingOnPauseRadioButton" Content="On paused frame" Margin="10 10 10 5"/>
+                            <RadioButton Name="markingOnEachFrameRadioButton" Content="On each frame" Margin="10 5 10 10"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Export settings -->
+                    <StackPanel Grid.Row="2" Grid.Column="3" VerticalAlignment="Center">
+                        <Button Name="exportSettingsButton" Content="Export settings" MaxWidth="200" MinHeight="30"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- Properties section -->
+            <Grid Grid.Column="1" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="8*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Start buttons -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Name="startPauseButton" Content="Start" Grid.Column="0" Margin="5"/>
+                    <Button Name="restartButton" Content="Restart"  Grid.Column="1" Margin="5"/>
+                </Grid>
+
+                <!-- Counted people -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontSize="16">
+                    <Label Content="Counted people:"/>
+                    <Label Name="peopleCounter" FontSize="18" Content="999"/>
+                </StackPanel>
+
+                <!-- Settings section -->
+                <GroupBox Header="Settings" Grid.Row="2" Margin="5 5 5 10">
+                    <StackPanel VerticalAlignment="Center">
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+        </Grid>
+    </DockPanel>
 </Window>
