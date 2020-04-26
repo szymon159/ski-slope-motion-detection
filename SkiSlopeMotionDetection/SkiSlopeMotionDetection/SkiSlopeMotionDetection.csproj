@@ -51,28 +51,28 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <ApplicationDefinition Include="PresentationLayer\App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ExportWindow.xaml">
+    <Page Include="PresentationLayer\ExportWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="PresentationLayer\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
+    <Compile Include="PresentationLayer\App.xaml.cs">
+      <DependentUpon>PresentationLayer\App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ExportSettings.cs" />
-    <Compile Include="ExportWindow.xaml.cs">
-      <DependentUpon>ExportWindow.xaml</DependentUpon>
+    <Compile Include="PresentationLayer\ExportSettings.cs" />
+    <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
+      <DependentUpon>PresentationLayer\ExportWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="PresentationLayer\MainWindow.xaml.cs">
+      <DependentUpon>PresentationLayer\MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
