@@ -34,22 +34,42 @@ namespace SkiSlopeMotionDetection
             reader = new VideoFileReader();
             reader.Open(videoPath);
 
+            UpdateProperties();
             FileIdentifier = Guid.NewGuid();
             FilePath = videoPath;
+        }
+        private void UpdateProperties()
+        {
+            if (reader == null)
+            {
+                reader = new VideoFileReader();
+                reader.Open(FilePath);
+            }
+
+            FrameWidth = reader.Width;
+            FrameHeight = reader.Height;
+            FrameCount = reader.FrameCount;
+            FrameRate = reader.FrameRate.Value;
         }
 
         public Guid FileIdentifier { get; private set; }
         public string FilePath { get; private set; }
-        public int FrameWidth => reader.Width;
-        public int FrameHeight => reader.Height;
-        public long FrameCount => reader.FrameCount;
-        public double FrameRate => reader.FrameRate.Value;
+        public int FrameWidth { get; private set; }
+        public int FrameHeight { get; private set; }
+        public long FrameCount { get; private set; }
+        public double FrameRate { get; private set; }
         public Bitmap GetFrame(int frameIndex)
         {
             Bitmap result = null;
 
             if (frameIndex > FrameCount || frameIndex < 0)
                 throw new ArgumentOutOfRangeException($"Unable to get frame number: {frameIndex}. File has only {FrameCount} frames");
+
+            if(reader == null)
+            {
+                reader = new VideoFileReader();
+                reader.Open(FilePath);
+            }
 
             while (true)
             {
