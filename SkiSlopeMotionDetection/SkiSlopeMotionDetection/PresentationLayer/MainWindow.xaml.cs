@@ -129,6 +129,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 videoControl.Source = new Uri(path);
                 videoControl.Play();
                 videoControl.Pause();
+
+                FrameReaderSingleton.GetInstance(path);
             }
         }
 

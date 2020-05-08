@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Accord.Video.FFMPEG;
+using System;
+using System.Drawing;
+using System.Threading;
 
 namespace SkiSlopeMotionDetection
 {
@@ -26,6 +29,30 @@ namespace SkiSlopeMotionDetection
                 throw new ArgumentNullException("You must provide a path to video file when creating instance of singleton");
 
             VideoPath = videoPath;            
+        }
+
+        public Bitmap GetFrame(int frameIndex)
+        {
+            Bitmap result = null;
+
+            using (var reader = new VideoFileReader())
+            {
+                reader.Open(VideoPath);
+                while(true)
+                {
+                    try
+                    {
+                        result = reader.ReadVideoFrame(frameIndex);
+                        break;
+                    }
+                    catch
+                    {
+                        Thread.Sleep(50);
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }
