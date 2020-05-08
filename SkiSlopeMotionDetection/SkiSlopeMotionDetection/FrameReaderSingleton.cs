@@ -13,42 +13,55 @@ namespace SkiSlopeMotionDetection
         {
             lock (padlock)
             {
-                if (instance == null)
+                if (instance == null || instance.FilePath != videoPath)
                     instance = new FrameReaderSingleton(videoPath);
 
                 return instance;
             }
         }
 
-        public string VideoPath { get; set; }
+        private VideoFileReader reader;
         private FrameReaderSingleton(string videoPath)
         {
-            if (instance != null)
+            if (instance != null && instance.FilePath == videoPath)
                 throw new NotSupportedException("Instance of FrameReaderSingleton already exists. Use FrameReaderSingleton.GetInstance()");
             else if (videoPath == null)
                 throw new ArgumentNullException("You must provide a path to video file when creating instance of singleton");
 
-            VideoPath = videoPath;            
+            if (reader != null && reader.IsOpen)
+                reader.Close();
+
+            reader = new VideoFileReader();
+            reader.Open(videoPath);
+
+            FileIdentifier = Guid.NewGuid();
+            FilePath = videoPath;
         }
 
+        public Guid FileIdentifier { get; private set; }
+        public string FilePath { get; private set; }
+        public int FrameWidth => reader.Width;
+        public int FrameHeight => reader.Height;
+        public long FrameCount => reader.FrameCount;
+        public double FrameRate => reader.FrameRate.Value;
         public Bitmap GetFrame(int frameIndex)
         {
             Bitmap result = null;
 
-            using (var reader = new VideoFileReader())
+            if (frameIndex > FrameCount || frameIndex < 0)
+                throw new ArgumentOutOfRangeException($"Unable to get frame number: {frameIndex}. File has only {FrameCount} frames");
+
+            while (true)
             {
-                reader.Open(VideoPath);
-                while(true)
+                try
                 {
-                    try
-                    {
-                        result = reader.ReadVideoFrame(frameIndex);
-                        break;
-                    }
-                    catch
-                    {
-                        Thread.Sleep(50);
-                    }
+                    result = reader.ReadVideoFrame(frameIndex);
+                    break;
+                }
+                catch
+                {
+                    // If we get to many frames without disposing previous ones need to wait for garbage collector as we run out of memory
+                    Thread.Sleep(50);
                 }
             }
 
