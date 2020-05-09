@@ -1,21 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -26,15 +13,15 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     {
         #region Private variables
 
-        private int currentFrameNumber = 0;
-        private int totalFrameNumber = 0;
-        private float fpsCounter = 0;
-        private int countedPeople = 0;
-        private bool shouldAdjustVideoRefreshRate = false;
-        private bool shouldMarkPeopleInRealTime = false;
-        private bool isVideoPaused = true;
-        private bool isVideoLoaded = false;
-        private bool isVideoEnded = false;
+        private int _currentFrameNumber = 0;
+        private int _totalFrameNumber = 0;
+        private float _fpsCounter = 0;
+        private int _countedPeople = 0;
+        private bool _shouldAdjustVideoRefreshRate = false;
+        private bool _shouldMarkPeopleInRealTime = false;
+        private bool _isVideoPaused = true;
+        private bool _isVideoLoaded = false;
+        private bool _isVideoEnded = false;
 
         #endregion
 
@@ -42,56 +29,56 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         public int CurrentFrameNumber
         {
-            get { return currentFrameNumber; }
-            set { currentFrameNumber = value; NotifyPropertyChanged(); }
+            get { return _currentFrameNumber; }
+            set { _currentFrameNumber = value; NotifyPropertyChanged(); }
         }
         public int TotalFrameNumber
         {
-            get { return totalFrameNumber; }
-            set { totalFrameNumber = value; NotifyPropertyChanged(); }
+            get { return _totalFrameNumber; }
+            set { _totalFrameNumber = value; NotifyPropertyChanged(); }
         }
         public float FPScounter
         {
-            get { return fpsCounter; }
-            set { fpsCounter = value; NotifyPropertyChanged(); }
+            get { return _fpsCounter; }
+            set { _fpsCounter = value; NotifyPropertyChanged(); }
         }
         public int CountedPeople
         {
-            get { return countedPeople; }
-            set { countedPeople = value; NotifyPropertyChanged(); }
+            get { return _countedPeople; }
+            set { _countedPeople = value; NotifyPropertyChanged(); }
         }
         public bool UseAdjustedRefreshRate
         {
-            get { return shouldAdjustVideoRefreshRate; }
-            set { shouldAdjustVideoRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
+            get { return _shouldAdjustVideoRefreshRate; }
+            set { _shouldAdjustVideoRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
         }
         public bool UseOriginalRefreshRate
         {
-            get { return !shouldAdjustVideoRefreshRate; }
-            set { shouldAdjustVideoRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
+            get { return !_shouldAdjustVideoRefreshRate; }
+            set { _shouldAdjustVideoRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
         public bool MarkPeopleOnPausedFrame
         {
-            get { return !shouldMarkPeopleInRealTime; }
-            set { shouldMarkPeopleInRealTime = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
+            get { return !_shouldMarkPeopleInRealTime; }
+            set { _shouldMarkPeopleInRealTime = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
         }
         public bool MarkPeopleOnEachFrame
         {
-            get { return shouldMarkPeopleInRealTime; }
-            set { shouldMarkPeopleInRealTime = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
+            get { return _shouldMarkPeopleInRealTime; }
+            set { _shouldMarkPeopleInRealTime = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
-            get { return isVideoLoaded ? Visibility.Collapsed : Visibility.Visible; }
+            get { return _isVideoLoaded ? Visibility.Collapsed : Visibility.Visible; }
         }
         public string PlayPauseButtonText
         {
-            get { return isVideoPaused ? "Play" : "Pause"; }
+            get { return _isVideoPaused ? "Play" : "Pause"; }
         }
         public bool IsVideoLoaded
         {
-            get { return isVideoLoaded; }
-            set { isVideoLoaded = value; NotifyPropertyChanged("IsVideoLoaded"); }
+            get { return _isVideoLoaded; }
+            set { _isVideoLoaded = value; NotifyPropertyChanged("IsVideoLoaded"); }
         }
 
         #endregion
@@ -112,8 +99,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void VideoControl_MediaEnded(object sender, RoutedEventArgs e)
         {
-            isVideoEnded = true;
-            isVideoPaused = true;
+            _isVideoEnded = true;
+            _isVideoPaused = true;
             NotifyPropertyChanged("PlayPauseButtonText");
         }
 
@@ -145,8 +132,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (!IsVideoLoaded)
                 return;
 
-            if (isVideoPaused)
-                PlayVideo(isVideoEnded);
+            if (_isVideoPaused)
+                PlayVideo(_isVideoEnded);
             else
                 PauseVideo();
         }
@@ -171,7 +158,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void PauseVideo()
         {
             videoControl.Pause();
-            isVideoPaused = true;
+            _isVideoPaused = true;
             NotifyPropertyChanged("PlayPauseButtonText");
         }
 
@@ -181,7 +168,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 videoControl.Stop();
 
             videoControl.Play();
-            isVideoPaused = false;
+            _isVideoPaused = false;
             NotifyPropertyChanged("PlayPauseButtonText");
         }
 

@@ -1,32 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
     public class ExportSettings : INotifyPropertyChanged
     {
-        private bool exportEntireVideo;
-        private bool includeMarking;
+        private bool _exportEntireVideo;
+        private bool _includeMarking;
 
         public bool ExportEntireVideo
         { 
-            get { return exportEntireVideo; } 
-            set { exportEntireVideo = value; NotifyPropertyChanged(); }
+            get { return _exportEntireVideo; } 
+            set { _exportEntireVideo = value; NotifyPropertyChanged(); }
         }
         public bool ExportSelectedFrame
         {
-            get { return !exportEntireVideo; }
-            set { exportEntireVideo = !value; NotifyPropertyChanged(); }
+            get { return !_exportEntireVideo; }
+            set { _exportEntireVideo = !value; NotifyPropertyChanged(); }
         }
         public bool IncludeMarking 
         { 
-            get { return includeMarking; } 
-            set { includeMarking = value; NotifyPropertyChanged(); }
+            get { return _includeMarking; } 
+            set { _includeMarking = value; NotifyPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

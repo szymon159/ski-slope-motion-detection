@@ -1,19 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -22,12 +11,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     /// </summary>
     public partial class ExportWindow : Window, INotifyPropertyChanged
     {
-        private ExportSettings settings;
+        private ExportSettings _settings;
 
         public ExportSettings ExportSettings 
         { 
-            get { return settings; }
-            set { settings = value; NotifyPropertyChanged(); }
+            get { return _settings; }
+            set { _settings = value; NotifyPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
