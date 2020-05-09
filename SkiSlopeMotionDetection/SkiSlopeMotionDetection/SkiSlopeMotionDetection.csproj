@@ -64,15 +64,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="PresentationLayer\App.xaml.cs">
-      <DependentUpon>PresentationLayer\App.xaml</DependentUpon>
+      <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PresentationLayer\ExportSettings.cs" />
     <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
-      <DependentUpon>PresentationLayer\ExportWindow.xaml</DependentUpon>
+      <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PresentationLayer\MainWindow.xaml.cs">
-      <DependentUpon>PresentationLayer\MainWindow.xaml</DependentUpon>
+      <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
