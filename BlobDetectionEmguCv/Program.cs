@@ -21,13 +21,13 @@ namespace BlobDetectionEmguCv
             //Bitmap image = (Bitmap)Bitmap.FromFile(path);
             //Image<Bgr, byte> image1 = new Image<Bgr, byte>(image);
 
-            Image<Bgr, byte> diff = GetDifference("imagediff1.jpg", "imagediff2.jpg");
-
+            Image<Bgr, byte> diff = GetDifference("imagediff1.jpg", "imagediff2.jpg",30);
             //Mat img = image1.Mat; //new Mat(path,Emgu.CV.CvEnum.LoadImageType.Unchanged);
             Mat img = diff.Mat;
             stopwatch.Start();
-     
-            Emgu.CV.Structure.MKeyPoint[] mKeys = Program.ReturnBlobs(img, 255, true, true, false, false, false, 50, 5000);
+
+            BlobDetectionOptions opts = new BlobDetectionOptions();
+            Emgu.CV.Structure.MKeyPoint[] mKeys = Program.ReturnBlobs(img,opts);
             Image<Bgr, byte> im2 = (CvInvoke.Imread("imagediff2.jpg", LoadImageType.Unchanged)).ToImage<Bgr, byte>();
 
             int count = mKeys.Length;
@@ -41,42 +41,47 @@ namespace BlobDetectionEmguCv
 
             // Image<Bgr, byte> diff = GetDifference("imagediff1.jpg", "imagediff2.jpg");
             List<Image<Bgr, byte >> frames = GetVideoFrames("videosample.mp4");
-            // VectorOfMat mats = new VectorOfMat();
-            // foreach (var el in frames)
-            //    mats.Push(el.Mat);
+
             CvInvoke.NamedWindow("Window", NamedWindowType.Normal);
             CvInvoke.Imshow("Window", im_with_keypoints);
             //CvInvoke.Imshow("Window", frames[0].Mat);
-           
-            // CvInvoke.Mean((IInputArray)new InputArray(mats));
             CvInvoke.WaitKey(0);
         }
 
-        static MKeyPoint[] ReturnBlobs(Mat img, int blobColor, bool filterByColor, bool filterByArea, bool filterByCircularity, bool filterByInertia, bool filterByConvexity,
-                                               int minArea, int maxArea)
+        static MKeyPoint[] ReturnBlobs(Mat img, BlobDetectionOptions opt)
         {
             var par = new SimpleBlobDetectorParams();
 
-            par.FilterByColor = true;
-            par.blobColor = (byte)blobColor;
-            par.FilterByCircularity = filterByCircularity;
-            par.FilterByCircularity = filterByCircularity;
-            par.FilterByConvexity = filterByConvexity;
-            par.FilterByInertia = filterByInertia;
-            par.FilterByArea = filterByArea;
-            par.MinArea = minArea;
-            par.MaxArea = maxArea;
+            par.FilterByColor = opt.filterByColor;
+            par.blobColor = (byte)opt.blobColor;
+
+            par.FilterByCircularity = opt.filterByCircularity;
+            par.MinCircularity = opt.minCircularity;
+            par.MaxCircularity = opt.maxCircularity;
+
+            par.FilterByConvexity = opt.filterByConvexity;
+            par.MinConvexity = opt.minConvexity;
+            par.MaxConvexity = opt.maxConvexity;
+
+            par.FilterByInertia = opt.filterByInertia;
+            par.MinInertiaRatio = opt.minInertia;
+            par.MaxInertiaRatio = opt.maxInertia;
+
+            par.FilterByArea = opt.filterByArea;
+            par.MinArea = opt.minArea;
+            par.MaxArea = opt.maxArea;
+
             SimpleBlobDetector detector = new SimpleBlobDetector(par);
 
             return detector.Detect(img);
         }
 
-        static Image<Bgr, byte> GetDifference(string path1, string path2)
+        static Image<Bgr, byte> GetDifference(string path1, string path2, int threshold)
         {
             Image<Bgr, byte> im1 = (CvInvoke.Imread(path1, LoadImageType.Unchanged)).ToImage<Bgr,byte>();
             Image<Bgr, byte> im2 = (CvInvoke.Imread(path2, LoadImageType.Unchanged)).ToImage<Bgr, byte>();
             Image<Bgr, byte> diff = im1.AbsDiff(im2);
-            diff = diff.ThresholdBinary(new Bgr(30, 30, 30), new Bgr(255, 255, 255));
+            diff = diff.ThresholdBinary(new Bgr(threshold, threshold, threshold), new Bgr(255, 255, 255));
             return diff;
          }
 
