@@ -1,8 +1,8 @@
-﻿<Application x:Class="SkiSlopeMotionDetection.App"
+﻿<Application x:Class="SkiSlopeMotionDetection.PresentationLayer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:SkiSlopeMotionDetection"
-             StartupUri="MainWindow.xaml">
+             xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer"
+             StartupUri="PresentationLayer/MainWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>
