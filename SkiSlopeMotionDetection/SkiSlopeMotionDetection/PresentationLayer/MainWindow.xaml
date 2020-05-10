@@ -84,7 +84,7 @@
 
                     <!-- Export settings -->
                     <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
-                        <Button Content="Export settings" Click="ExportButton_Click" IsEnabled="{Binding IsVideoLoaded}" MaxWidth="200" MinHeight="30"/>
+                        <Button Content="Export" Click="ExportButton_Click" IsEnabled="{Binding IsVideoLoaded}" MaxWidth="200" MinHeight="30"/>
                     </StackPanel>
                 </Grid>
             </Grid>
