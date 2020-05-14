@@ -3,6 +3,10 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -175,5 +179,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         }
 
         #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Bitmap bm = Processing.GetAverage(400);
+            MemoryStream ms = new MemoryStream();
+            bm.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            BitmapImage image = new BitmapImage();
+            image.BeginInit();
+            ms.Seek(0, SeekOrigin.Begin);
+            image.StreamSource = ms;
+            image.EndInit();
+            Image.Source = image;
+
+        }
     }
 }
