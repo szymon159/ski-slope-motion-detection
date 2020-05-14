@@ -5,8 +5,13 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Drawing;
 using System.Drawing.Imaging;
+using BlobDetectionEmguCv;
 using System.IO;
 using System.Windows.Media.Imaging;
+using Emgu.CV;
+using Emgu.CV.Features2D;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -183,15 +188,26 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Bitmap bm = Processing.GetAverage(400);
+            FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
+            Bitmap bm2 = reader.GetFrame(401);
+            Bitmap bm3 = (BlobDetectionEmguCv.BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
+
+            BlobDetectionOptions opts = new BlobDetectionOptions() { minArea=25};
+            Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
+            Mat im_with_keypoints = new Mat();
+            Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
+            Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), im_with_keypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
             MemoryStream ms = new MemoryStream();
-            bm.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+
+            Bitmap final = (im_with_keypoints.ToImage<Bgr, byte>()).ToBitmap();
+            final.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
             BitmapImage image = new BitmapImage();
             image.BeginInit();
             ms.Seek(0, SeekOrigin.Begin);
             image.StreamSource = ms;
             image.EndInit();
             Image.Source = image;
-
+            
         }
     }
 }
