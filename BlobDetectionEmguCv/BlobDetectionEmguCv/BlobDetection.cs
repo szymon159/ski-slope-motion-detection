@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace BlobDetectionEmguCv
 {
-    static class BlobDetection
+    public static class BlobDetection
     {
         public static MKeyPoint[] ReturnBlobs(Mat img, BlobDetectionOptions opt)
         {
@@ -47,10 +47,10 @@ namespace BlobDetectionEmguCv
         }
         public static MKeyPoint[] ReturnBlobs(Bitmap bm1, BlobDetectionOptions opt)
         {
-            Image<Bgr, byte> image1 = new Image<Bgr, byte>(bm1);
-            Mat img = image1.Mat;
+            Image<Bgr, byte> im1 = new Image<Bgr, byte>(bm1);
+            Mat mat = im1.Mat;
 
-            return ReturnBlobs(img, opt);
+            return ReturnBlobs(mat, opt);
         }
         public static Image<Bgr, byte> GetDifference(string path1, string path2, int threshold)
         {
