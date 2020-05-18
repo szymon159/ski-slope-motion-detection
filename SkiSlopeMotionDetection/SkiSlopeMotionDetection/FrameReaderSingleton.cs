@@ -13,7 +13,7 @@ namespace SkiSlopeMotionDetection
         {
             lock (_padlock)
             {
-                if (_instance == null || _instance.FilePath != videoPath)
+                if (_instance == null || (_instance.FilePath != videoPath && videoPath!=null))
                     _instance = new FrameReaderSingleton(videoPath);
 
                 return _instance;

@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiSlopeMotionDetection", "SkiSlopeMotionDetection\SkiSlopeMotionDetection.csproj", "{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobDetectionEmguCv", "..\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj", "{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobDetectionEmguCv", "BlobDetectionEmguCv\BlobDetectionEmguCv.csproj", "{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +11,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -26,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4648F534-2B9B-4C09-BCF0-22FA1517647D}
+		SolutionGuid = {36F22A10-0FE8-41D9-BBAC-8E40D968ACB1}
 	EndGlobalSection
 EndGlobal
