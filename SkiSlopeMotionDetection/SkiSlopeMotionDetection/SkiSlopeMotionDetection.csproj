@@ -96,6 +96,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="BlobDetection.cs" />
+    <Compile Include="BlobDetectionOptions.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -129,7 +131,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -139,12 +140,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj">
-      <Project>{89aa6d80-343d-4d6b-b64b-8f7eea8f7f17}</Project>
-      <Name>BlobDetectionEmguCv</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Accord.3.8.0\build\Accord.targets" Condition="Exists('..\packages\Accord.3.8.0\build\Accord.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

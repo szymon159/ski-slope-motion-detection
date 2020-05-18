@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Threading;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 

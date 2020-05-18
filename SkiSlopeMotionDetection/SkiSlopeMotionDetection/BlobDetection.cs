@@ -10,33 +10,13 @@ using System.Drawing;
 using System.Collections.Generic;
 
 
-namespace BlobDetectionEmguCv
+namespace SkiSlopeMotionDetection
 {
     public static class BlobDetection
     {
         public static MKeyPoint[] ReturnBlobs(Mat img, BlobDetectionOptions opt)
         {
-            var par = new SimpleBlobDetectorParams();
-
-            par.FilterByColor = opt.filterByColor;
-            par.blobColor = (byte)opt.blobColor;
-
-            par.FilterByCircularity = opt.filterByCircularity;
-            par.MinCircularity = opt.minCircularity;
-            par.MaxCircularity = opt.maxCircularity;
-
-            par.FilterByConvexity = opt.filterByConvexity;
-            par.MinConvexity = opt.minConvexity;
-            par.MaxConvexity = opt.maxConvexity;
-
-            par.FilterByInertia = opt.filterByInertia;
-            par.MinInertiaRatio = opt.minInertia;
-            par.MaxInertiaRatio = opt.maxInertia;
-
-            par.FilterByArea = opt.filterByArea;
-            par.MinArea = opt.minArea;
-            par.MaxArea = opt.maxArea;
-
+            var par = opt.ToSimpleBlobDetectorParams();
             SimpleBlobDetector detector = new SimpleBlobDetector(par);
 
             return detector.Detect(img);
