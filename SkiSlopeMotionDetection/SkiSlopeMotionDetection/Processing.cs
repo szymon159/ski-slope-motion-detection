@@ -14,7 +14,7 @@ namespace SkiSlopeMotionDetection
             (double, double, double)[,] mean = new (double, double, double)[reader.FrameWidth, reader.FrameHeight];
             for (int i = 0; i < frameCount; i++)
             {
-                Bitmap frame = reader.GetFrame(startframe+i);
+                Bitmap frame = reader.GetFrame(startFrame+i);
                 unsafe
                 {
                     BitmapData bitmapData = frame.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.ReadWrite, frame.PixelFormat);
