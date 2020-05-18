@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiSlopeMotionDetection", "SkiSlopeMotionDetection\SkiSlopeMotionDetection.csproj", "{4C5FD9C6-00AA-4115-B42C-BEEA49F21FA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobDetectionEmguCv", "..\..\..\..\..\source\repos\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj", "{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlobDetectionEmguCv", "..\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj", "{89AA6D80-343D-4D6B-B64B-8F7EEA8F7F17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

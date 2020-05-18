@@ -140,7 +140,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\..\source\repos\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj">
+    <ProjectReference Include="..\..\BlobDetectionEmguCv\BlobDetectionEmguCv\BlobDetectionEmguCv.csproj">
       <Project>{89aa6d80-343d-4d6b-b64b-8f7eea8f7f17}</Project>
       <Name>BlobDetectionEmguCv</Name>
     </ProjectReference>
