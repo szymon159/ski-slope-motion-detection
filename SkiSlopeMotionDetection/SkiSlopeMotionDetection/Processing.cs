@@ -8,7 +8,7 @@ namespace SkiSlopeMotionDetection
 {
     static class Processing
     {
-        public static Bitmap GetAverage(int frameCount,int startframe)
+        public static Bitmap GetAverage(int frameCount,int startFrame)
         {
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
             (double, double, double)[,] mean = new (double, double, double)[reader.FrameWidth, reader.FrameHeight];
