@@ -118,7 +118,7 @@
                 <!-- Settings section -->
                 <GroupBox Header="Settings" Grid.Row="2" Margin="5 5 5 10">
                 </GroupBox>
-                <Button Content="Test" Click="Button_Click"  HorizontalAlignment="Left" Height="25" Margin="10,22.6,0,0" Grid.Row="1" VerticalAlignment="Top" Width="48" RenderTransformOrigin="0.179,0.429"/>
+                <Button Content="Test" Click="Button_Click"  HorizontalAlignment="Left" Height="25" Margin="10,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50"/>
             </Grid>
         </Grid>
     </DockPanel>

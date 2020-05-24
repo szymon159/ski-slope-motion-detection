@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Drawing;
 using System.Drawing.Imaging;
-using BlobDetectionEmguCv;
 using System.IO;
 using System.Windows.Media.Imaging;
 using Emgu.CV;
@@ -191,9 +190,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             Bitmap bm = Processing.GetAverage(400,1000);
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
             Bitmap bm2 = reader.GetFrame(1400);
-            Bitmap bm3 = (BlobDetectionEmguCv.BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
+            Bitmap bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
 
-            BlobDetectionOptions opts = new BlobDetectionOptions() { minArea = 80 };
+            BlobDetectionOptions opts = new BlobDetectionOptions(80);
             Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
             Mat im_with_keypoints = new Mat();
             Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
