@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer"
+        xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer" xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="Ski Slope Motion Detection" Height="720" Width="1280" Background="LightGray">
@@ -36,10 +36,11 @@
                 </Grid.RowDefinitions>
 
                 <!-- Player -->
-                <Rectangle Grid.Row="0" Fill="DarkGray"/>
-                <MediaElement Name="videoControl" Grid.Row="0" MediaOpened="VideoControl_MediaOpened" MediaEnded="VideoControl_MediaEnded" IsMuted="True" LoadedBehavior="Manual"/>
-                <Button Content="Load video" Grid.Row="0" Click="OpenButton_Click" Width="100" Height="100" Opacity="0.5" Visibility="{Binding LoadVideoButtonVisibility}"/>
-                <Image  Grid.Row="0" Name="Image" HorizontalAlignment="Right" Height="415" Margin="0,31,5.2,0" VerticalAlignment="Top" Width="895"/>
+                <WindowsFormsHost>
+                    <emgu:ImageBox x:Name="playerFrameBox" BackColor="DarkGray" FunctionalMode="Minimum" SizeMode="Zoom"></emgu:ImageBox>
+                </WindowsFormsHost>
+                <MediaElement Name="videoControl" Grid.Row="0" MediaOpened="VideoControl_MediaOpened" MediaEnded="VideoControl_MediaEnded" IsMuted="True" LoadedBehavior="Manual" Visibility="Hidden"/>
+                <Button Content="Load video" Grid.Row="0" Click="OpenButton_Click" Width="100" Height="100" Opacity="0.5" Visibility="Hidden"/>
 
                 <!-- Panel below player -->
                 <Grid Grid.Row="1" Margin="0, 10, 0, 00">
@@ -53,16 +54,28 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Frame number -->
-                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" TextElement.FontSize="16">
-                        <Label Content="Frame:"/>
-                        <Label Content="{Binding CurrentFrameNumber}"/>
-                        <Label Content="/"/>
-                        <Label Content="{Binding TotalFrameNumber}"/>
-                    </StackPanel>
+                    <Grid Grid.Row="0" Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Frame number -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontSize="16">
+                            <Label Content="Frame:"/>
+                            <Label Content="{Binding CurrentFrameNumber}"/>
+                            <Label Content="/"/>
+                            <Label Content="{Binding TotalFrameNumber}"/>
+                        </StackPanel>
+                        
+                        <!-- Frame change buttons -->
+                        <Button Grid.Column="1" Content="&lt;- Previous" Margin="5 2"/>
+                        <Button Grid.Column="2" Content="Next -&gt;" Margin="5 2"/>
+                    </Grid>
 
                     <!-- FPS counter -->
-                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" TextElement.FontSize="16">
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontSize="16">
                         <Label Content="FPS:"/>
                         <Label Content="{Binding FPScounter}"/>
                     </StackPanel>
