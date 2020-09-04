@@ -108,6 +108,10 @@
     <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PresentationLayer\FrameData.cs" />
+    <Compile Include="PresentationLayer\ImageBoxPlayer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="PresentationLayer\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -37,9 +37,16 @@
 
                 <!-- Player -->
                 <WindowsFormsHost>
-                    <emgu:ImageBox x:Name="playerFrameBox" BackColor="DarkGray" FunctionalMode="Minimum" SizeMode="Zoom"></emgu:ImageBox>
+                    <local:ImageBoxPlayer x:Name="videoControl"
+                                          BackColor="DarkGray" 
+                                          FunctionalMode="Minimum" 
+                                          SizeMode="Zoom" 
+                                          MediaOpened="VideoControl_MediaOpened" 
+                                          MediaEnded="VideoControl_MediaEnded"
+                                          FrameChanged="VideoControl_FrameChanged">
+                    </local:ImageBoxPlayer>
                 </WindowsFormsHost>
-                <MediaElement Name="videoControl" Grid.Row="0" MediaOpened="VideoControl_MediaOpened" MediaEnded="VideoControl_MediaEnded" IsMuted="True" LoadedBehavior="Manual" Visibility="Hidden"/>
+                <!--<MediaElement Name="videoControl" Grid.Row="0" MediaOpened="VideoControl_MediaOpened" MediaEnded="VideoControl_MediaEnded" IsMuted="True" LoadedBehavior="Manual" Visibility="Hidden"/>-->
                 <Button Content="Load video" Grid.Row="0" Click="OpenButton_Click" Width="100" Height="100" Opacity="0.5" Visibility="Hidden"/>
 
                 <!-- Panel below player -->
@@ -56,9 +63,9 @@
 
                     <Grid Grid.Row="0" Grid.Column="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="2*"/>
-                            <ColumnDefinition Width="2*"/>
+                            <!--<ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>-->
                         </Grid.ColumnDefinitions>
                         
                         <!-- Frame number -->
@@ -66,18 +73,18 @@
                             <Label Content="Frame:"/>
                             <Label Content="{Binding CurrentFrameNumber}"/>
                             <Label Content="/"/>
-                            <Label Content="{Binding TotalFrameNumber}"/>
+                            <Label Content="{Binding TotalFrameNumber}" />
                         </StackPanel>
                         
-                        <!-- Frame change buttons -->
-                        <Button Grid.Column="1" Content="&lt;- Previous" Margin="5 2"/>
-                        <Button Grid.Column="2" Content="Next -&gt;" Margin="5 2"/>
+                        <!-- Frame change buttons --><!--
+                        <Button Grid.Column="1" Content="&lt;- Previous" Margin="5 2" Click="RewindButton_Click"/>
+                        <Button Grid.Column="2" Content="Next -&gt;" Margin="5 2" Click="FastForwardButton_Click"/>-->
                     </Grid>
 
                     <!-- FPS counter -->
                     <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontSize="16">
                         <Label Content="FPS:"/>
-                        <Label Content="{Binding FPScounter}"/>
+                        <Label Content="{Binding FPScounter}" ContentStringFormat="{}{0:N2}"/>
                     </StackPanel>
 
                     <!-- Refresh rate -->

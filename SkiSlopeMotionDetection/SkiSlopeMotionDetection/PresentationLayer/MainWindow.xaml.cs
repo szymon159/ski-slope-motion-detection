@@ -12,6 +12,7 @@ using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System.Threading;
+using System.Windows.Controls;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -24,7 +25,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private int _currentFrameNumber = 0;
         private int _totalFrameNumber = 0;
-        private float _fpsCounter = 0;
+        private double _fpsCounter = 0;
         private int _countedPeople = 0;
         private bool _shouldAdjustVideoRefreshRate = false;
         private bool _shouldMarkPeopleInRealTime = false;
@@ -46,7 +47,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _totalFrameNumber; }
             set { _totalFrameNumber = value; NotifyPropertyChanged(); }
         }
-        public float FPScounter
+        public double FPScounter
         {
             get { return _fpsCounter; }
             set { _fpsCounter = value; NotifyPropertyChanged(); }
@@ -100,17 +101,24 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void VideoControl_MediaOpened(object sender, RoutedEventArgs e)
+        private void VideoControl_MediaOpened()/*(object sender, RoutedEventArgs e)*/
         {
             IsVideoLoaded = true;
             NotifyPropertyChanged("LoadVideoButtonVisibility");
         }
 
-        private void VideoControl_MediaEnded(object sender, RoutedEventArgs e)
+        private void VideoControl_MediaEnded()/*(object sender, RoutedEventArgs e)*/
         {
             _isVideoEnded = true;
             _isVideoPaused = true;
             NotifyPropertyChanged("PlayPauseButtonText");
+        }
+
+        private void VideoControl_FrameChanged(FrameData frameData)
+        {
+            CurrentFrameNumber = frameData.CurrentFrame;
+            FPScounter = frameData.FPS;
+            CountedPeople = frameData.CountedPeople;
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
@@ -122,11 +130,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (openFileDialog.ShowDialog() == true)
             {
                 var path = openFileDialog.FileName;
-                videoControl.Source = new Uri(path);
-                videoControl.Play();
-                videoControl.Pause();
+                videoControl.Source = path;
 
-                FrameReaderSingleton.GetInstance(path);
+                TotalFrameNumber = (int)FrameReaderSingleton.GetInstance(path).FrameCount;
             }
         }
 
@@ -156,6 +162,16 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             PlayVideo(true);
         }
+
+        //private void RewindButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    videoControl.Rewind();
+        //}
+
+        //private void FastForwardButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    videoControl.FastForward();
+        //}
 
         #endregion
 
@@ -210,8 +226,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             image.StreamSource = ms;
             image.EndInit();
 
-            playerFrameBox.Image = new Image<Bgr, Byte>(new Bitmap(image.StreamSource));
-            playerFrameBox.Invalidate();
+            videoControl.SetFrameContent(image);
         }
     }
 }

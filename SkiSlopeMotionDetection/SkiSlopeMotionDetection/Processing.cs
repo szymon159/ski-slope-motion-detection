@@ -45,7 +45,7 @@ namespace SkiSlopeMotionDetection
             {
                 BitmapData bitmapData = returnBitmap.LockBits(new Rectangle(0, 0, returnBitmap.Width, returnBitmap.Height), ImageLockMode.ReadWrite, returnBitmap.PixelFormat);
 
-                int bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
+                int bytesPerPixel = Image.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
                 int heightInPixels = bitmapData.Height;
                 int widthInBytes = bitmapData.Width * bytesPerPixel;
                 byte* PtrFirstPixel = (byte*)bitmapData.Scan0;
