@@ -173,6 +173,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             NotifyPropertyChanged("PlayPauseButtonText");
         }
 
+        // For play with natural ratio
+        // Run (background worker ?) fetching frames in endless loop, after fetching frame sleep for few milisecods to match the ratio
+        // If natural ratio is not set then disable the sleep part and just fetch the frames in endless loop (or until they're finished)
         private void PlayVideo(bool fromBeginning = false)
         {
             if (fromBeginning)
@@ -206,8 +209,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             ms.Seek(0, SeekOrigin.Begin);
             image.StreamSource = ms;
             image.EndInit();
-            Image.Source = image;
-            Image.InvalidateVisual();
+
+            playerFrameBox.Image = new Image<Bgr, Byte>(new Bitmap(image.StreamSource));
+            playerFrameBox.Invalidate();
         }
     }
 }
