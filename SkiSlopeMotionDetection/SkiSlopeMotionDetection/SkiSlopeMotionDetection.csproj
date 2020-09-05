@@ -108,6 +108,7 @@
     <Compile Include="BlobDetection.cs" />
     <Compile Include="BlobDetectionOptions.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
+    <Compile Include="Heatmap.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
