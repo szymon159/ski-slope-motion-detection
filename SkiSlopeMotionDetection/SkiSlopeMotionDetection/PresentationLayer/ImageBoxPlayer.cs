@@ -29,17 +29,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private double _frameRate;
         private double _frameTime;
 
-        public string Source 
-        { 
-            get { return _source; } 
-            set { _source = value; SourceUpdated(); } 
-        }
         public Action MediaOpened { get; set; }
         public Action MediaEnded { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
         public bool UseOriginalRefreshRate { get; set; } = true;
         public Bitmap BackgroundBitmap { get; set; }
+        public bool EnableBlobMarking { get; set; }
+        public string Source
+        {
+            get { return _source; }
+            set { _source = value; SourceUpdated(); }
+        }
 
         public ImageBoxPlayer()
         {
@@ -177,7 +178,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     {
                         DetectionMethod = DetectionMethod.DiffWithAverage,
                         AverageBitmap = BackgroundBitmap,
-                        BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+                        BlobDetectionOptions = new EmguBlobDetectionOptions(80),
+                        MarkBlobs = EnableBlobMarking
                     };
                     var image = BlobDetection.GetResultImage(frame, detectionParams, out countedPeople);
 

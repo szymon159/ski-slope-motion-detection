@@ -36,6 +36,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private bool _isVideoEnded = false;
         private bool _isBackgroundImageLoaded = false;
         private Bitmap _backgroundImage;
+        //private BlobDetectionParameters _blobDetectionParameters;
 
         #endregion
 
@@ -69,17 +70,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool UseOriginalRefreshRate
         {
             get { return _useOriginalRefreshRate; }
-            set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
+            set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; if (value) MarkPeopleOnEachFrame = false; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
         public bool MarkPeopleOnPausedFrame
         {
             get { return !_shouldMarkPeopleInRealTime; }
-            set { _shouldMarkPeopleInRealTime = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
+            set { _shouldMarkPeopleInRealTime = !value; videoControl.EnableBlobMarking = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
         }
         public bool MarkPeopleOnEachFrame
         {
             get { return _shouldMarkPeopleInRealTime; }
-            set { _shouldMarkPeopleInRealTime = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
+            set { _shouldMarkPeopleInRealTime = value; videoControl.EnableBlobMarking = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
@@ -231,11 +232,29 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             videoControl.Pause();
             IsVideoPaused = true;
+
+            Task.Delay(100).ContinueWith(t =>
+            {
+                if (!_shouldMarkPeopleInRealTime)
+                {
+                    var reader = FrameReaderSingleton.GetInstance();
+                    var frame = reader.GetFrame(CurrentFrameNumber);
+
+                    var detectionParams = new BlobDetectionParameters()
+                    {
+                        DetectionMethod = DetectionMethod.DiffWithAverage,
+                        AverageBitmap = _backgroundImage,
+                        BlobDetectionOptions = new EmguBlobDetectionOptions(80),
+                        MarkBlobs = true
+                    };
+                    var image = BlobDetection.GetResultImage(frame, detectionParams, out int countedPeople);
+                    CountedPeople = countedPeople;
+
+                    videoControl.SetFrameContent(image);
+                }
+            });
         }
 
-        // For play with natural ratio
-        // Run (background worker ?) fetching frames in endless loop, after fetching frame sleep for few milisecods to match the ratio
-        // If natural ratio is not set then disable the sleep part and just fetch the frames in endless loop (or until they're finished)
         private void PlayVideo(bool fromBeginning = false)
         {
             if (fromBeginning)
@@ -250,7 +269,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         #endregion
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void TestButton_Click(object sender, RoutedEventArgs e)
         {
             var reader = FrameReaderSingleton.GetInstance();
             var source = reader.GetFrame(1400);
