@@ -1,4 +1,5 @@
 ﻿using Accord;
+using Accord.Math;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
@@ -25,6 +26,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private FrameReaderSingleton _frameReader;
         private BackgroundWorker _frameReaderWorker;
         private long _frameCount;
+        private double _frameRate;
 
         public string Source 
         { 
@@ -35,6 +37,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public Action MediaEnded { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
+        public bool UseOriginalRefreshRate { get; set; }
 
         public ImageBoxPlayer()
         {
@@ -44,8 +47,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
-            _frameReaderWorker.DoWork += _worker_DoWork;
-            _frameReaderWorker.RunWorkerCompleted += _worker_RunWorkerCompleted;
+            _frameReaderWorker.DoWork += FrameReaderWorker_DoWork;
+            _frameReaderWorker.RunWorkerCompleted += FrameReaderWorker_RunWorkerCompleted;
             //_worker.ProgressChanged += _worker_ProgressChanged;
         }
 
@@ -58,6 +61,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 _frameReader = FrameReaderSingleton.GetInstance(Source);
 
             _frameCount = _frameReader.FrameCount;
+            _frameRate = _frameReader.FrameRate;
             if (!_frameReaderWorker.IsBusy)
                 _frameReaderWorker.RunWorkerAsync();
 
@@ -93,14 +97,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         //        _currentFrame++;
         //}
 
-        public void SetFrameContent(BitmapImage bitmapImage, bool pauseVideo = false)
-        {
-            if(pauseVideo)
-                Pause();
+        //public void SetFrameContent(BitmapImage bitmapImage, bool pauseVideo = false)
+        //{
+        //    if(pauseVideo)
+        //        Pause();
 
-            Image = new Image<Bgr, Byte>(new Bitmap(bitmapImage.StreamSource));
-            Invalidate();
-        }
+        //    Image = new Image<Bgr, Byte>(new Bitmap(bitmapImage.StreamSource));
+        //    Invalidate();
+        //}
 
         public void SetFrameContent(Bitmap bitmap, bool pauseVideo = false)
         {
@@ -122,7 +126,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         //    throw new NotImplementedException();
         //}
 
-        private void _worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void FrameReaderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsVideoPlaying = false;
             
@@ -130,20 +134,20 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 MediaEnded?.Invoke();
         }
 
-        private void _worker_DoWork(object sender, DoWorkEventArgs e)
+        private void FrameReaderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             if(_frameReader == null)
                 throw new ArgumentException("Unable to fetch next frame. Frame reader has not been set");
 
             while (_currentFrame < _frameCount)
             {
-                var startTime = DateTime.Now;
                 if (_frameReaderWorker.CancellationPending)
                 {
                     e.Cancel = true;
                     break;
                 }
 
+                var startTime = DateTime.Now;
                 var frame = _frameReader.GetFrame(_currentFrame);
                 SetFrameContent(frame);
 

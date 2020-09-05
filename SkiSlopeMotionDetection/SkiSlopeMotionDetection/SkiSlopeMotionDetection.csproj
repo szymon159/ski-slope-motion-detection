@@ -98,7 +98,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="BlobDetection.cs" />
-    <Compile Include="BlobDetectionOptions.cs" />
+    <Compile Include="BlobDetectionParameters.cs" />
+    <Compile Include="EmguBlobDetectionOptions.cs" />
+    <Compile Include="DetectionMethod.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

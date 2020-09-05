@@ -1,18 +1,24 @@
-﻿using System.Drawing;
+﻿using Emgu.CV;
+using Emgu.CV.Features2D;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace SkiSlopeMotionDetection
 {
     static class Processing
     {
-        public static Bitmap GetAverage(int frameCount,int startFrame)
+        public static Bitmap GetAverage(int frameCount, int startFrame)
         {
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
             (double, double, double)[,] mean = new (double, double, double)[reader.FrameWidth, reader.FrameHeight];
             for (int i = 0; i < frameCount; i++)
             {
-                Bitmap frame = reader.GetFrame(startFrame+i);
+                Bitmap frame = reader.GetFrame(startFrame + i);
                 unsafe
                 {
                     BitmapData bitmapData = frame.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.ReadWrite, frame.PixelFormat);
@@ -56,8 +62,8 @@ namespace SkiSlopeMotionDetection
                     for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
                     {
                         currentLine[x] = (byte)mean[x / bytesPerPixel, y].Item1;
-                        currentLine[x+1] = (byte)mean[x / bytesPerPixel, y].Item2;
-                        currentLine[x+2] = (byte)mean[x / bytesPerPixel, y].Item3;
+                        currentLine[x + 1] = (byte)mean[x / bytesPerPixel, y].Item2;
+                        currentLine[x + 2] = (byte)mean[x / bytesPerPixel, y].Item3;
                     }
                 });
                 returnBitmap.UnlockBits(bitmapData);

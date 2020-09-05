@@ -27,7 +27,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private int _totalFrameNumber = 0;
         private double _fpsCounter = 0;
         private int _countedPeople = 0;
-        private bool _shouldAdjustVideoRefreshRate = false;
+        private bool _useOriginalRefreshRate = true;
         private bool _shouldMarkPeopleInRealTime = false;
         private bool _isVideoPaused = true;
         private bool _isVideoLoaded = false;
@@ -59,13 +59,13 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         }
         public bool UseAdjustedRefreshRate
         {
-            get { return _shouldAdjustVideoRefreshRate; }
-            set { _shouldAdjustVideoRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
+            get { return !_useOriginalRefreshRate; }
+            set { _useOriginalRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
         }
         public bool UseOriginalRefreshRate
         {
-            get { return !_shouldAdjustVideoRefreshRate; }
-            set { _shouldAdjustVideoRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
+            get { return _useOriginalRefreshRate; }
+            set { _useOriginalRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
         public bool MarkPeopleOnPausedFrame
         {
@@ -206,26 +206,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Bitmap bm = Processing.GetAverage(400,1000);
-            FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
-            Bitmap bm2 = reader.GetFrame(1400);
-            Bitmap bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
+            var reader = FrameReaderSingleton.GetInstance();
+            var source = reader.GetFrame(1400);
+            var detectionParams = new BlobDetectionParameters()
+            {
+                DetectionMethod = DetectionMethod.DiffWithAverage,
+                AvgRangeBegin = 400,
+                AvgRangeEnd = 1000,
+                BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+            };
+            var image = BlobDetection.GetResultImage(source, detectionParams, out int countedPeople);
+            CountedPeople = countedPeople;
 
-            BlobDetectionOptions opts = new BlobDetectionOptions(80);
-            Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
-            Mat im_with_keypoints = new Mat();
-            Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
-            Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), im_with_keypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
-            MemoryStream ms = new MemoryStream();
-
-            Bitmap final = (im_with_keypoints.ToImage<Bgr, byte>()).ToBitmap();
-            final.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-            BitmapImage image = new BitmapImage();
-            image.BeginInit();
-            ms.Seek(0, SeekOrigin.Begin);
-            image.StreamSource = ms;
-            image.EndInit();
-
+            CurrentFrameNumber = 1400;
             videoControl.SetFrameContent(image);
         }
     }
