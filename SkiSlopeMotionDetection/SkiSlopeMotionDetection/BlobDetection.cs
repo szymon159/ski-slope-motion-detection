@@ -75,7 +75,8 @@ namespace SkiSlopeMotionDetection
                 if (!detectionParams.AvgRangeBegin.HasValue || !detectionParams.AvgRangeEnd.HasValue)
                     throw new ArgumentException("Unable to get average frame, either bitmap or ranges have to be specified");
 
-                average = Processing.GetAverage(detectionParams.AvgRangeBegin.Value, detectionParams.AvgRangeEnd.Value);
+                var framesCount = detectionParams.AvgRangeEnd.Value - detectionParams.AvgRangeBegin.Value + 1;
+                average = Processing.GetAverage(framesCount, detectionParams.AvgRangeBegin.Value);
             }
 
             Bitmap difference = (GetDifference(average, sourceBitmap, detectionParams.DifferenceThreshold)).ToBitmap();

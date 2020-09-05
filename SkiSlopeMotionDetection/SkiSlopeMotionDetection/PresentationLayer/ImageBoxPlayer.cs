@@ -39,12 +39,13 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
         public bool UseOriginalRefreshRate { get; set; } = true;
+        public Bitmap BackgroundBitmap { get; set; }
 
         public ImageBoxPlayer()
         {
             _frameReaderWorker = new BackgroundWorker()
             {
-                WorkerReportsProgress = true,
+                //WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
             _frameReaderWorker.DoWork += FrameReaderWorker_DoWork;
@@ -140,6 +141,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void FrameReaderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            int countedPeople = 0;
             IsVideoPlaying = true;
 
             if(_frameReader == null)
@@ -147,29 +149,46 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             while (_currentFrame < _frameCount)
             {
+                var startTime = DateTime.Now;
+
                 if (_frameReaderWorker.CancellationPending)
                 {
                     e.Cancel = true;
                     break;
                 }
 
-                var startTime = DateTime.Now;
                 var frame = _frameReader.GetFrame(_currentFrame);
-                SetFrameContent(frame);
 
-                FrameData frameData = new FrameData()
-                {
-                    CurrentFrame = _currentFrame
-                };
-
+                // If using original refresh rate, just display the video without running computations
                 if(UseOriginalRefreshRate)
                 {
+                    SetFrameContent(frame);
+                    countedPeople = 0;
+
                     var frameTime = DateTime.Now - startTime;
                     var sleepTime = _frameTime - frameTime.TotalMilliseconds;
                     if (--sleepTime > 0)
                         Thread.Sleep((int)sleepTime);
                 }
+                else
+                {
+                    // TODO: Parametrize params :) 
+                    var detectionParams = new BlobDetectionParameters()
+                    {
+                        DetectionMethod = DetectionMethod.DiffWithAverage,
+                        AverageBitmap = BackgroundBitmap,
+                        BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+                    };
+                    var image = BlobDetection.GetResultImage(frame, detectionParams, out countedPeople);
 
+                    SetFrameContent(image);
+                }
+
+                FrameData frameData = new FrameData()
+                {
+                    CurrentFrame = _currentFrame,
+                    CountedPeople = countedPeople
+                };
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (SendOrPostCallback)delegate
                 {
                     var time = DateTime.Now - startTime;

@@ -176,6 +176,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             {
                 var path = openFileDialog.FileName;
                 _backgroundImage = new Bitmap(path);
+                videoControl.BackgroundBitmap = _backgroundImage;
                 IsBackgroundImageLoaded = true;
             }
         }
