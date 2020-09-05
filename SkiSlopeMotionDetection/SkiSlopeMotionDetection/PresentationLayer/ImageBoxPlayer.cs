@@ -32,17 +32,16 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public string Source 
         { 
             get { return _source; } 
-            set { _source = value; _frameReader = FrameReaderSingleton.GetInstance(Source); MediaOpened?.Invoke(); DisplayFirstFrame(); } 
+            set { _source = value; SourceUpdated(); } 
         }
         public Action MediaOpened { get; set; }
         public Action MediaEnded { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
-        public bool UseOriginalRefreshRate { get; set; }
+        public bool UseOriginalRefreshRate { get; set; } = true;
 
         public ImageBoxPlayer()
         {
-            _currentFrame = 0;
             _frameReaderWorker = new BackgroundWorker()
             {
                 WorkerReportsProgress = true,
@@ -60,10 +59,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             if (_frameReader == null)
                 _frameReader = FrameReaderSingleton.GetInstance(Source);
-
-            _frameCount = _frameReader.FrameCount;
-            _frameRate = _frameReader.FrameRate;
-            _frameTime = 1000 / _frameRate;
 
             if (!_frameReaderWorker.IsBusy)
                 _frameReaderWorker.RunWorkerAsync();
@@ -110,6 +105,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             Image = new Image<Bgr, Byte>(bitmap);
             Invalidate();
+        }
+
+        private void SourceUpdated()
+        {
+            _frameReader = FrameReaderSingleton.GetInstance(Source);
+            _frameCount = _frameReader.FrameCount;
+            _frameRate = _frameReader.FrameRate;
+            _frameTime = 1000 / _frameRate;
+            _currentFrame = 0;
+
+            DisplayFirstFrame();
+            MediaOpened?.Invoke(); 
         }
 
         private void DisplayFirstFrame()
