@@ -84,7 +84,7 @@
                     <!-- FPS counter -->
                     <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontSize="16">
                         <Label Content="FPS:"/>
-                        <Label Content="{Binding FPScounter}" ContentStringFormat="{}{0:N2}"/>
+                        <Label Content="{Binding FPScounter}" ContentStringFormat="{}{0:N0}"/>
                     </StackPanel>
 
                     <!-- Refresh rate -->
@@ -110,7 +110,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Export settings -->
+                        <!-- Load background image -->
                         <StackPanel Grid.Row="0" VerticalAlignment="Center">
                             <Label Content="{Binding BackgroundImageLoadedLabel}" HorizontalAlignment="Center" Foreground="{Binding BackgroundImageLoadedLabelColor}"/>
                             <Button Content="Load background" Click="LoadBackgroundButton_Click" IsEnabled="{Binding IsVideoPaused}" MaxWidth="200" MinHeight="30"/>

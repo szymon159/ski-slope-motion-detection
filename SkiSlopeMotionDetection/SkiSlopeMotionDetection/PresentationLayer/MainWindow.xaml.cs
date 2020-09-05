@@ -64,12 +64,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool UseAdjustedRefreshRate
         {
             get { return !_useOriginalRefreshRate; }
-            set { _useOriginalRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
+            set { _useOriginalRefreshRate = !value; videoControl.UseOriginalRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
         }
         public bool UseOriginalRefreshRate
         {
             get { return _useOriginalRefreshRate; }
-            set { _useOriginalRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
+            set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
         public bool MarkPeopleOnPausedFrame
         {

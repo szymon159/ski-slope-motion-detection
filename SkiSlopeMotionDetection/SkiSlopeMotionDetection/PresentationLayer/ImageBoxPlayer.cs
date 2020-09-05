@@ -27,6 +27,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private BackgroundWorker _frameReaderWorker;
         private long _frameCount;
         private double _frameRate;
+        private double _frameTime;
 
         public string Source 
         { 
@@ -62,6 +63,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             _frameCount = _frameReader.FrameCount;
             _frameRate = _frameReader.FrameRate;
+            _frameTime = 1000 / _frameRate;
 
             if (!_frameReaderWorker.IsBusy)
                 _frameReaderWorker.RunWorkerAsync();
@@ -152,6 +154,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 {
                     CurrentFrame = _currentFrame
                 };
+
+                if(UseOriginalRefreshRate)
+                {
+                    var frameTime = DateTime.Now - startTime;
+                    var sleepTime = _frameTime - frameTime.TotalMilliseconds;
+                    if (--sleepTime > 0)
+                        Thread.Sleep((int)sleepTime);
+                }
 
                 Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (SendOrPostCallback)delegate
                 {
