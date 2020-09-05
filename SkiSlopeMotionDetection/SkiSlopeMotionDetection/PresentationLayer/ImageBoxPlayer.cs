@@ -9,10 +9,12 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -145,13 +147,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 var frame = _frameReader.GetFrame(_currentFrame);
                 SetFrameContent(frame);
 
-                var time = DateTime.Now - startTime;
                 FrameData frameData = new FrameData()
                 {
-                    CurrentFrame = _currentFrame,
-                    FPS = 1 / time.TotalSeconds
+                    CurrentFrame = _currentFrame
                 };
-                FrameChanged?.Invoke(frameData);
+
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                {
+                    var time = DateTime.Now - startTime;
+                    frameData.FPS = 1 / time.TotalSeconds;
+                    FrameChanged?.Invoke(frameData);
+                }, null);
 
                 _currentFrame++;
             }
