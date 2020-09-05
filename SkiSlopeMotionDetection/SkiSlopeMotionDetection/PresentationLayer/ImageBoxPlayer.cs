@@ -62,27 +62,22 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             _frameCount = _frameReader.FrameCount;
             _frameRate = _frameReader.FrameRate;
+
             if (!_frameReaderWorker.IsBusy)
                 _frameReaderWorker.RunWorkerAsync();
-
-            IsVideoPlaying = true;
         }
 
         public void Pause()
         {
             if (_frameReaderWorker.IsBusy)
                 _frameReaderWorker.CancelAsync();
-
-            IsVideoPlaying = false;
         }
 
         public void Stop()
         {
-            if (_frameReaderWorker.IsBusy)
-                _frameReaderWorker.CancelAsync();
+            Pause();
 
             _currentFrame = 0;
-            IsVideoPlaying = false;
         }
 
         //public void Rewind()
@@ -136,6 +131,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void FrameReaderWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            IsVideoPlaying = true;
+
             if(_frameReader == null)
                 throw new ArgumentException("Unable to fetch next frame. Frame reader has not been set");
 
@@ -156,7 +153,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     CurrentFrame = _currentFrame
                 };
 
-                Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (SendOrPostCallback)delegate
                 {
                     var time = DateTime.Now - startTime;
                     frameData.FPS = 1 / time.TotalSeconds;

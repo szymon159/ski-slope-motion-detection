@@ -13,6 +13,8 @@ using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System.Threading;
 using System.Windows.Controls;
+using System.Threading.Tasks;
+using System.Configuration;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -32,6 +34,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private bool _isVideoPaused = true;
         private bool _isVideoLoaded = false;
         private bool _isVideoEnded = false;
+        private bool _isBackgroundImageLoaded = false;
+        private Bitmap _backgroundImage;
 
         #endregion
 
@@ -90,6 +94,29 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _isVideoLoaded; }
             set { _isVideoLoaded = value; NotifyPropertyChanged("IsVideoLoaded"); }
         }
+        public bool IsVideoPaused
+        {
+            get { return _isVideoPaused; }
+            set { _isVideoPaused = value; NotifyPropertyChanged("PlayPauseButtonText"); NotifyPropertyChanged("IsVideoPaused"); }
+        }
+        public bool IsVideoEnded
+        {
+            get { return _isVideoEnded; }
+            set { _isVideoEnded = value; }
+        }
+        public bool IsBackgroundImageLoaded
+        {
+            get { return _isBackgroundImageLoaded; }
+            set { _isBackgroundImageLoaded = value; NotifyPropertyChanged("BackgroundImageLoadedLabel"); NotifyPropertyChanged("BackgroundImageLoadedLabelColor"); }
+        }
+        public string BackgroundImageLoadedLabel
+        {
+            get { return IsBackgroundImageLoaded ? "Background loaded" : "Background not loaded"; }
+        }
+        public string BackgroundImageLoadedLabelColor
+        {
+            get { return IsBackgroundImageLoaded ? "Green" : "Red"; }
+        }
 
         #endregion
 
@@ -101,17 +128,16 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void VideoControl_MediaOpened()/*(object sender, RoutedEventArgs e)*/
+        private void VideoControl_MediaOpened()
         {
             IsVideoLoaded = true;
             NotifyPropertyChanged("LoadVideoButtonVisibility");
         }
 
-        private void VideoControl_MediaEnded()/*(object sender, RoutedEventArgs e)*/
+        private void VideoControl_MediaEnded()
         {
-            _isVideoEnded = true;
-            _isVideoPaused = true;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            IsVideoEnded = true;
+            IsVideoPaused = true;
         }
 
         private void VideoControl_FrameChanged(FrameData frameData)
@@ -123,9 +149,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Video files (*.mp4;*.avi)|*.mp4;*.avi";
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory;
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Video files (*.mp4;*.avi)|*.mp4;*.avi",
+                InitialDirectory = Environment.CurrentDirectory
+            };
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -133,6 +161,22 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 videoControl.Source = path;
 
                 TotalFrameNumber = (int)FrameReaderSingleton.GetInstance(path).FrameCount;
+            }
+        }
+
+        private void LoadBackgroundButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Image files (*.bmp;*.gif;*.exif;*.jpg;*.png;*.tiff)|*.bmp;*.gif;*.exif;*.jpg;*.png;*.tiff",
+                InitialDirectory = Environment.CurrentDirectory
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var path = openFileDialog.FileName;
+                _backgroundImage = new Bitmap(path);
+                IsBackgroundImageLoaded = true;
             }
         }
 
@@ -149,8 +193,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (!IsVideoLoaded)
                 return;
 
-            if (_isVideoPaused)
-                PlayVideo(_isVideoEnded);
+            if (IsVideoPaused)
+                PlayVideo(IsVideoEnded);
             else
                 PauseVideo();
         }
@@ -185,8 +229,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void PauseVideo()
         {
             videoControl.Pause();
-            _isVideoPaused = true;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            IsVideoPaused = true;
         }
 
         // For play with natural ratio
@@ -197,9 +240,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (fromBeginning)
                 videoControl.Stop();
 
-            videoControl.Play();
-            _isVideoPaused = false;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            Task.Delay(100).ContinueWith(t =>
+            {
+                videoControl.Play();
+                IsVideoPaused = false;
+            });
         }
 
         #endregion

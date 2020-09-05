@@ -103,10 +103,24 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <!-- Export settings -->
-                    <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Center">
-                        <Button Content="Export" Click="ExportButton_Click" IsEnabled="{Binding IsVideoLoaded}" MaxWidth="200" MinHeight="30"/>
-                    </StackPanel>
+                    <!-- Load background image and configure export -->
+                    <Grid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Export settings -->
+                        <StackPanel Grid.Row="0" VerticalAlignment="Center">
+                            <Label Content="{Binding BackgroundImageLoadedLabel}" HorizontalAlignment="Center" Foreground="{Binding BackgroundImageLoadedLabelColor}"/>
+                            <Button Content="Load background" Click="LoadBackgroundButton_Click" IsEnabled="{Binding IsVideoPaused}" MaxWidth="200" MinHeight="30"/>
+                        </StackPanel>
+
+                        <!-- Export settings -->
+                        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                            <Button Content="Export" Click="ExportButton_Click" IsEnabled="{Binding IsVideoLoaded}" MaxWidth="200" MinHeight="30"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
 
