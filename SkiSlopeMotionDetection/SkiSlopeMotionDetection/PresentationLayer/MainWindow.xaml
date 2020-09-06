@@ -46,7 +46,6 @@
                                           FrameChanged="VideoControl_FrameChanged">
                     </local:ImageBoxPlayer>
                 </WindowsFormsHost>
-                <!--<MediaElement Name="videoControl" Grid.Row="0" MediaOpened="VideoControl_MediaOpened" MediaEnded="VideoControl_MediaEnded" IsMuted="True" LoadedBehavior="Manual" Visibility="Hidden"/>-->
                 <Button Content="Load video" Grid.Row="0" Click="OpenButton_Click" Width="100" Height="100" Opacity="0.5" Visibility="Hidden"/>
 
                 <!-- Panel below player -->
