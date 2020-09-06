@@ -37,6 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
@@ -79,6 +80,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="ZedGraph, Version=5.1.5.28844, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
       <HintPath>..\packages\ZedGraph.5.1.5\lib\ZedGraph.dll</HintPath>
     </Reference>
@@ -97,7 +99,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="BlobDetection.cs" />
-    <Compile Include="BlobDetectionOptions.cs" />
+    <Compile Include="BlobDetectionParameters.cs" />
+    <Compile Include="EmguBlobDetectionOptions.cs" />
+    <Compile Include="DetectionMethod.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -106,6 +110,10 @@
     <Compile Include="PresentationLayer\ExportSettings.cs" />
     <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PresentationLayer\FrameData.cs" />
+    <Compile Include="PresentationLayer\ImageBoxPlayer.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="PresentationLayer\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

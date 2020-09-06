@@ -4,14 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Windows.Media.Imaging;
-using Emgu.CV;
-using Emgu.CV.Features2D;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -24,13 +17,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private int _currentFrameNumber = 0;
         private int _totalFrameNumber = 0;
-        private float _fpsCounter = 0;
+        private double _fpsCounter = 0;
         private int _countedPeople = 0;
-        private bool _shouldAdjustVideoRefreshRate = false;
-        private bool _shouldMarkPeopleInRealTime = false;
+        private bool _useOriginalRefreshRate = false;
         private bool _isVideoPaused = true;
         private bool _isVideoLoaded = false;
         private bool _isVideoEnded = false;
+        private bool _isBackgroundImageLoaded = false;
+        private BlobDetectionParameters _blobDetectionParameters = new BlobDetectionParameters()
+        {
+            // TODO: Parametrize
+            DetectionMethod = DetectionMethod.DiffWithAverage,
+            BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+        };
 
         #endregion
 
@@ -46,7 +45,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _totalFrameNumber; }
             set { _totalFrameNumber = value; NotifyPropertyChanged(); }
         }
-        public float FPScounter
+        public double FPScounter
         {
             get { return _fpsCounter; }
             set { _fpsCounter = value; NotifyPropertyChanged(); }
@@ -58,23 +57,23 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         }
         public bool UseAdjustedRefreshRate
         {
-            get { return _shouldAdjustVideoRefreshRate; }
-            set { _shouldAdjustVideoRefreshRate = value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
+            get { return !_useOriginalRefreshRate; }
+            set { _useOriginalRefreshRate = !value; videoControl.UseOriginalRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseOriginalRefreshRate"); }
         }
         public bool UseOriginalRefreshRate
         {
-            get { return !_shouldAdjustVideoRefreshRate; }
-            set { _shouldAdjustVideoRefreshRate = !value; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
+            get { return _useOriginalRefreshRate; }
+            set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; if (value) MarkPeopleOnEachFrame = false; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
         public bool MarkPeopleOnPausedFrame
         {
-            get { return !_shouldMarkPeopleInRealTime; }
-            set { _shouldMarkPeopleInRealTime = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
+            get { return !_blobDetectionParameters.MarkBlobs; }
+            set { _blobDetectionParameters.MarkBlobs = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
         }
         public bool MarkPeopleOnEachFrame
         {
-            get { return _shouldMarkPeopleInRealTime; }
-            set { _shouldMarkPeopleInRealTime = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
+            get { return _blobDetectionParameters.MarkBlobs; }
+            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
@@ -89,6 +88,34 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _isVideoLoaded; }
             set { _isVideoLoaded = value; NotifyPropertyChanged("IsVideoLoaded"); }
         }
+        public bool IsVideoPaused
+        {
+            get { return _isVideoPaused; }
+            set { _isVideoPaused = value; NotifyPropertyChanged("PlayPauseButtonText"); NotifyPropertyChanged("IsVideoPaused"); }
+        }
+        public bool IsVideoEnded
+        {
+            get { return _isVideoEnded; }
+            set { _isVideoEnded = value; }
+        }
+        public bool IsBackgroundImageLoaded
+        {
+            get { return _isBackgroundImageLoaded; }
+            set { _isBackgroundImageLoaded = value; NotifyPropertyChanged("BackgroundImageLoadedLabel"); NotifyPropertyChanged("BackgroundImageLoadedLabelColor"); }
+        }
+        public string BackgroundImageLoadedLabel
+        {
+            get { return IsBackgroundImageLoaded ? "Background loaded" : "Background not loaded"; }
+        }
+        public string BackgroundImageLoadedLabelColor
+        {
+            get { return IsBackgroundImageLoaded ? "Green" : "Red"; }
+        }
+        public BlobDetectionParameters BlobDetectionParameters
+        {
+            get { return _blobDetectionParameters; }
+            set { _blobDetectionParameters = value; NotifyPropertyChanged(); }
+        }
 
         #endregion
 
@@ -100,33 +127,44 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void VideoControl_MediaOpened(object sender, RoutedEventArgs e)
+        private void MainWindow_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            IsVideoLoaded = true;
-            NotifyPropertyChanged("LoadVideoButtonVisibility");
-        }
-
-        private void VideoControl_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            _isVideoEnded = true;
-            _isVideoPaused = true;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            if(e.PropertyName == "BlobDetectionParameters")
+            {
+                videoControl.UpdateBlobDetectionParameters(BlobDetectionParameters);
+            }
         }
 
         private void OpenButton_Click(object sender, RoutedEventArgs e)
         {
-            var openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Video files (*.mp4;*.avi)|*.mp4;*.avi";
-            openFileDialog.InitialDirectory = Environment.CurrentDirectory;
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Video files (*.mp4;*.avi)|*.mp4;*.avi",
+                InitialDirectory = Environment.CurrentDirectory
+            };
 
             if (openFileDialog.ShowDialog() == true)
             {
                 var path = openFileDialog.FileName;
-                videoControl.Source = new Uri(path);
-                videoControl.Play();
-                videoControl.Pause();
+                videoControl.Source = path;
 
-                FrameReaderSingleton.GetInstance(path);
+                TotalFrameNumber = (int)FrameReaderSingleton.GetInstance(path).FrameCount;
+            }
+        }
+
+        private void LoadBackgroundButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Image files (*.bmp;*.gif;*.exif;*.jpg;*.png;*.tiff)|*.bmp;*.gif;*.exif;*.jpg;*.png;*.tiff",
+                InitialDirectory = Environment.CurrentDirectory
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                var path = openFileDialog.FileName;
+                BlobDetectionParameters.AverageBitmap = new Bitmap(path);
+                IsBackgroundImageLoaded = true;
             }
         }
 
@@ -143,8 +181,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (!IsVideoLoaded)
                 return;
 
-            if (_isVideoPaused)
-                PlayVideo(_isVideoEnded);
+            if (IsVideoPaused)
+                PlayVideo(IsVideoEnded);
             else
                 PauseVideo();
         }
@@ -157,11 +195,47 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             PlayVideo(true);
         }
 
+        //private void RewindButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    videoControl.Rewind();
+        //}
+
+        //private void FastForwardButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    videoControl.FastForward();
+        //}
+
+        #endregion
+
+        #region Callbacks
+
+        private void VideoControl_MediaOpened()
+        {
+            IsVideoLoaded = true;
+            NotifyPropertyChanged("LoadVideoButtonVisibility");
+        }
+
+        private void VideoControl_MediaEnded()
+        {
+            IsVideoEnded = true;
+            IsVideoPaused = true;
+        }
+
+        private void VideoControl_FrameChanged(FrameData frameData)
+        {
+            CurrentFrameNumber = frameData.CurrentFrame;
+            FPScounter = frameData.FPS;
+            CountedPeople = frameData.CountedPeople;
+        }
+
         #endregion
 
         public MainWindow()
         {
+            PropertyChanged += MainWindow_PropertyChanged;
             InitializeComponent();
+
+            videoControl.UpdateBlobDetectionParameters(BlobDetectionParameters);
         }
 
         #region Private methods
@@ -169,8 +243,23 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void PauseVideo()
         {
             videoControl.Pause();
-            _isVideoPaused = true;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            IsVideoPaused = true;
+
+            Task.Delay(100).ContinueWith(t =>
+            {
+                if (!BlobDetectionParameters.MarkBlobs)
+                {
+                    var reader = FrameReaderSingleton.GetInstance();
+                    var frame = reader.GetFrame(CurrentFrameNumber);
+
+                    BlobDetectionParameters.MarkBlobs = true;
+                    var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
+                    BlobDetectionParameters.MarkBlobs = false;
+                    CountedPeople = countedPeople;
+
+                    videoControl.SetFrameContent(image);
+                }
+            });
         }
 
         private void PlayVideo(bool fromBeginning = false)
@@ -178,36 +267,31 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (fromBeginning)
                 videoControl.Stop();
 
-            videoControl.Play();
-            _isVideoPaused = false;
-            NotifyPropertyChanged("PlayPauseButtonText");
+            Task.Delay(100).ContinueWith(t =>
+            {
+                videoControl.Play();
+                IsVideoPaused = false;
+            });
         }
 
         #endregion
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void TestButton_Click(object sender, RoutedEventArgs e)
         {
-            Bitmap bm = Processing.GetAverage(400,1000);
-            FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
-            Bitmap bm2 = reader.GetFrame(1400);
-            Bitmap bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
+            var reader = FrameReaderSingleton.GetInstance();
+            var source = reader.GetFrame(1400);
+            var detectionParams = new BlobDetectionParameters()
+            {
+                DetectionMethod = DetectionMethod.DiffWithAverage,
+                AvgRangeBegin = 400,
+                AvgRangeEnd = 1000,
+                BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+            };
+            var image = BlobDetection.GetResultImage(source, detectionParams, out int countedPeople);
+            CountedPeople = countedPeople;
 
-            BlobDetectionOptions opts = new BlobDetectionOptions(80);
-            Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
-            Mat im_with_keypoints = new Mat();
-            Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
-            Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), im_with_keypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
-            MemoryStream ms = new MemoryStream();
-
-            Bitmap final = (im_with_keypoints.ToImage<Bgr, byte>()).ToBitmap();
-            final.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-            BitmapImage image = new BitmapImage();
-            image.BeginInit();
-            ms.Seek(0, SeekOrigin.Begin);
-            image.StreamSource = ms;
-            image.EndInit();
-            Image.Source = image;
-            Image.InvalidateVisual();
+            CurrentFrameNumber = 1400;
+            videoControl.SetFrameContent(image);
         }
     }
 }
