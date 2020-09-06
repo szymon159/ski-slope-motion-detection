@@ -21,15 +21,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     /// <summary>
     /// Interaction logic for HeatmapWindow.xaml
     /// </summary>
-    public partial class HeatmapWindow : Window, INotifyPropertyChanged
+    public partial class HeatmapWindow : Window
     {
-        private Heatmap heatmap;
-
-        public Heatmap Heatmap
-        {
-            get { return heatmap; }
-            set { heatmap = value; NotifyPropertyChanged(); }
-        }
+        public Heatmap Heatmap { get; set; }
 
         public HeatmapWindow(int width, int height, int startFrame, int frameCount)
         {
@@ -46,12 +40,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 Heatmap.UpdateSeries(mKeys);
             }
             InitializeComponent();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

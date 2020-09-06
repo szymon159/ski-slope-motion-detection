@@ -7,10 +7,10 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
          DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="HeatmapWindow" Height="450" Width="800">
+        Title="Areas used by skiers" Height="450" Width="800" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" Topmost="True">
     <Grid>
-        <oxy:PlotView Model="{Binding Heatmap,UpdateSourceTrigger=PropertyChanged}" 
-        IsEnabled="True"
-        Background="LightGray"></oxy:PlotView>
+        <oxy:PlotView Model="{Binding Heatmap.HeatMap}" 
+                      IsEnabled="True"
+                      Background="LightGray"/>
     </Grid>
 </Window>
