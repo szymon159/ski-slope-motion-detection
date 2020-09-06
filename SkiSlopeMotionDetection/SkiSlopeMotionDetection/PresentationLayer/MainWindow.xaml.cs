@@ -190,28 +190,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Bitmap bm = Processing.GetAverage(400,1000);
-            FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
-            Bitmap bm2 = reader.GetFrame(1400);
-            Bitmap bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
+            var reader = FrameReaderSingleton.GetInstance();
+            var heatMapWindow = new HeatmapWindow(reader.FrameWidth,reader.FrameHeight);
+            heatMapWindow.Owner = Window.GetWindow(this);
 
-            BlobDetectionOptions opts = new BlobDetectionOptions(80);
-            Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
-            Mat im_with_keypoints = new Mat();
-            Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
-            Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), im_with_keypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
-            MemoryStream ms = new MemoryStream();
-
-            Bitmap final = (im_with_keypoints.ToImage<Bgr, byte>()).ToBitmap();
-            final.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-            BitmapImage image = new BitmapImage();
-            image.BeginInit();
-            ms.Seek(0, SeekOrigin.Begin);
-            image.StreamSource = ms;
-            image.EndInit();
-
-            playerFrameBox.Image = new Image<Bgr, Byte>(new Bitmap(image.StreamSource));
-            playerFrameBox.Invalidate();
+            heatMapWindow.Show();
         }
     }
 }

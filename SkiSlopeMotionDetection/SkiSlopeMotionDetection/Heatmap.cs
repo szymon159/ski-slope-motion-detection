@@ -7,18 +7,33 @@ using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.Axes;
 using Emgu.CV.Structure;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
-namespace SkiSlopeMotionDetection
+namespace SkiSlopeMotionDetection.PresentationLayer
 {
-    public class Heatmap
+    public class Heatmap : INotifyPropertyChanged
     {
         private PlotModel heatMap;
         public PlotModel HeatMap
         {
             get { return heatMap; }
-            set { heatMap = value; }
+            set { heatMap = value; NotifyPropertyChanged(); }
         }
+
+        public string Title
+        {
+            get { return heatMap.Title; }
+            set { heatMap.Title = value; }
+        }
+
         private HeatMapSeries series;
+
+        public HeatMapSeries Series
+        {
+            get { return series; }
+            set { series = value; NotifyPropertyChanged(); }
+        }
 
         public Heatmap(int width, int height)
         {
@@ -30,7 +45,7 @@ namespace SkiSlopeMotionDetection
                 IsLegendVisible = false,
             };
 
-            series = new HeatMapSeries
+            Series = new HeatMapSeries
             {
                 Title = "HMSeries",
                 Interpolate = true,
@@ -40,8 +55,8 @@ namespace SkiSlopeMotionDetection
                 Y1 = height
             };
 
-            series.Data = new double[width, height];
-            heatMap.Series.Add(series);
+            Series.Data = new double[width, height];
+            heatMap.Series.Add(Series);
 
             heatMap.Axes.Add(new LinearColorAxis
             {
@@ -62,13 +77,18 @@ namespace SkiSlopeMotionDetection
                     {
                         double dist = Math.Sqrt(Math.Pow(-blobrange + k, 2) + Math.Pow(-j + k, 2));
                         double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
-                        series.Data[(int)keyPoints[i - blobrange + k].Point.X, (int)keyPoints[i - j + k].Point.Y] += val;
-
+                        if (i - blobrange + k > Series.Data.GetLength(0) || i - j + k > Series.Data.GetLength(1)) break;
+                        if (i - j + k < 0 || i - blobrange + k < 0) continue;
+                        Series.Data[(int)keyPoints[i - blobrange + k].Point.X, (int)keyPoints[i - j + k].Point.Y] += val;
                     }
                 }
             }
         }
-
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
     }
 }

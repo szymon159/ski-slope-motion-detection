@@ -101,6 +101,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PresentationLayer\HeatmapWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PresentationLayer\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -116,6 +120,9 @@
     <Compile Include="PresentationLayer\ExportSettings.cs" />
     <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PresentationLayer\HeatmapWindow.xaml.cs">
+      <DependentUpon>HeatmapWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PresentationLayer\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
