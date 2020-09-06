@@ -66,6 +66,8 @@ namespace SkiSlopeMotionDetection
             switch (detectionParams.DetectionMethod)
             {
                 case DetectionMethod.DiffWithBackground:
+                    detectionParams.AverageBitmap = detectionParams.BackgroundBitmap;
+                    return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
                 case DetectionMethod.DiffWithAverage:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
                 default:

@@ -12,6 +12,7 @@ namespace SkiSlopeMotionDetection
 
 
         public Bitmap AverageBitmap { get; set; }
+        public Bitmap BackgroundBitmap { get; set; }
         public EmguBlobDetectionOptions BlobDetectionOptions { get; set; }
     }
 }

@@ -174,7 +174,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 else
                 {
                     // Update average if necessary
-                    if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage && _currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0)
+                    if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage 
+                        && ((_currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0) || _blobDetectionParams.BackgroundBitmap == _blobDetectionParams.AverageBitmap))
                     {
                         _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
                         _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);

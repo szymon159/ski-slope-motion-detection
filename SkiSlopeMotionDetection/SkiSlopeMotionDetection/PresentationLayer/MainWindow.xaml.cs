@@ -22,7 +22,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private bool _useOriginalRefreshRate = false;
         private bool _isVideoPaused = true;
         private bool _isVideoLoaded = false;
-        private bool _isVideoEnded = false;
         private bool _isBackgroundImageLoaded = false;
         private BlobDetectionParameters _blobDetectionParameters = new BlobDetectionParameters()
         {
@@ -95,8 +94,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         }
         public bool IsVideoEnded
         {
-            get { return _isVideoEnded; }
-            set { _isVideoEnded = value; }
+            get;
+            set;
         }
         public bool IsBackgroundImageLoaded
         {
@@ -163,7 +162,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (openFileDialog.ShowDialog() == true)
             {
                 var path = openFileDialog.FileName;
-                BlobDetectionParameters.AverageBitmap = new Bitmap(path);
+                BlobDetectionParameters.BackgroundBitmap = new Bitmap(path);
                 IsBackgroundImageLoaded = true;
             }
         }
