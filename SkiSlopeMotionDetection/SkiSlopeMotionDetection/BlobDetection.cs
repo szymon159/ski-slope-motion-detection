@@ -39,6 +39,10 @@ namespace SkiSlopeMotionDetection
         {
             Image<Bgr, byte> im1 = (CvInvoke.Imread(path1, LoadImageType.Unchanged)).ToImage<Bgr, byte>();
             Image<Bgr, byte> im2 = (CvInvoke.Imread(path2, LoadImageType.Unchanged)).ToImage<Bgr, byte>();
+
+            if (im1.Height != im2.Height || im1.Width != im2.Width)
+                throw new ArgumentException("Both video and background image must have the same size");
+
             Image<Bgr, byte> diff = im1.AbsDiff(im2);
             diff = diff.ThresholdBinary(new Bgr(threshold, threshold, threshold), new Bgr(255, 255, 255));
             return diff;
@@ -48,6 +52,10 @@ namespace SkiSlopeMotionDetection
         {
             Image<Bgr, byte> im1 = new Image<Bgr, byte>(bm1);
             Image<Bgr, byte> im2 = new Image<Bgr, byte>(bm2);
+
+            if (im1.Height != im2.Height || im1.Width != im2.Width)
+                throw new ArgumentException("Both video and background image must have the same size");
+
             Image<Bgr, byte> diff = im1.AbsDiff(im2);
             diff = diff.ThresholdBinary(new Bgr(threshold, threshold, threshold), new Bgr(255, 255, 255));
             return diff;
