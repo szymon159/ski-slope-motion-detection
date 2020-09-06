@@ -245,21 +245,28 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             videoControl.Pause();
             IsVideoPaused = true;
 
-            Task.Delay(100).ContinueWith(t =>
+            try
             {
-                if (!BlobDetectionParameters.MarkBlobs)
+                Task.Delay(100).ContinueWith(t =>
                 {
-                    var reader = FrameReaderSingleton.GetInstance();
-                    var frame = reader.GetFrame(CurrentFrameNumber);
+                    if (!BlobDetectionParameters.MarkBlobs)
+                    {
+                        var reader = FrameReaderSingleton.GetInstance();
+                        var frame = reader.GetFrame(CurrentFrameNumber);
 
-                    BlobDetectionParameters.MarkBlobs = true;
-                    var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
-                    BlobDetectionParameters.MarkBlobs = false;
-                    CountedPeople = countedPeople;
+                        BlobDetectionParameters.MarkBlobs = true;
+                        var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
+                        BlobDetectionParameters.MarkBlobs = false;
+                        CountedPeople = countedPeople;
 
-                    videoControl.SetFrameContent(image);
-                }
-            });
+                        videoControl.SetFrameContent(image);
+                    }
+                }).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         private void PlayVideo(bool fromBeginning = false)
@@ -267,11 +274,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (fromBeginning)
                 videoControl.Stop();
 
-            Task.Delay(100).ContinueWith(t =>
+            try
             {
-                videoControl.Play();
-                IsVideoPaused = false;
-            });
+                Task.Delay(100).ContinueWith(t =>
+                {
+                    videoControl.Play();
+                    IsVideoPaused = false;
+                }).Wait();
+            }
+            catch(AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         #endregion

@@ -129,6 +129,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void FrameReaderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsVideoPlaying = false;
+
+            if (e.Error != null)
+                throw e.Error;
             
             if(!e.Cancelled)
                 MediaEnded?.Invoke();
