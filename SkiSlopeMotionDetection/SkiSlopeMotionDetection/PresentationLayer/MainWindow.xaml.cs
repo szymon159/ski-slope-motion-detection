@@ -27,7 +27,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private BlobDetectionParameters _blobDetectionParameters = new BlobDetectionParameters()
         {
             // TODO: Parametrize
-            DetectionMethod = DetectionMethod.DiffWithAverage,
+            DetectionMethod = DetectionMethod.DiffWithBackground,
             BlobDetectionOptions = new EmguBlobDetectionOptions(80)
         };
 
@@ -282,7 +282,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var source = reader.GetFrame(1400);
             var detectionParams = new BlobDetectionParameters()
             {
-                DetectionMethod = DetectionMethod.DiffWithAverage,
+                DetectionMethod = DetectionMethod.DiffWithBackground,
                 AvgRangeBegin = 400,
                 AvgRangeEnd = 1000,
                 BlobDetectionOptions = new EmguBlobDetectionOptions(80)

@@ -65,7 +65,7 @@ namespace SkiSlopeMotionDetection
         {
             switch (detectionParams.DetectionMethod)
             {
-                case DetectionMethod.DiffWithAverage:
+                case DetectionMethod.DiffWithBackground:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
