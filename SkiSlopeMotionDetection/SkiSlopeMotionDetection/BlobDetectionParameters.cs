@@ -4,22 +4,11 @@ namespace SkiSlopeMotionDetection
 {
     public class BlobDetectionParameters
     {
-        private int? _differenceThreshold = null;
-        private bool? _markBlobs = null;
-
         public DetectionMethod? DetectionMethod { get; set; }
         public int? AvgRangeBegin { get; set; }
         public int? AvgRangeEnd { get; set; }
-        public bool MarkBlobs
-        {
-            get { return _markBlobs ?? true; }
-            set { _markBlobs = value; }
-        }
-        public int DifferenceThreshold 
-        { 
-            get { return _differenceThreshold ?? 30; }
-            set { _differenceThreshold = value; }
-        }
+        public bool MarkBlobs { get; set; } = true;
+        public int DifferenceThreshold { get; set; } = 30;
 
 
         public Bitmap AverageBitmap { get; set; }
