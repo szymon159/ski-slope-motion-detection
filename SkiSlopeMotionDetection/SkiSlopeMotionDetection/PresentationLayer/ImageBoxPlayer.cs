@@ -23,6 +23,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private double _frameTime;
         private BlobDetectionParameters _blobDetectionParams;
 
+        private AverageFrame avgFrame;
+
         #endregion
 
         #region Properties
@@ -163,6 +165,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                 var frame = _frameReader.GetFrame(_currentFrame);
 
+                if(_currentFrame == 0)
+                {
+                    avgFrame = new AverageFrame(frame.Width, frame.Height);
+                }
+
                 // If using original refresh rate, just display the video without running computations
                 if(UseOriginalRefreshRate)
                 {
@@ -177,11 +184,20 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 else
                 {
                     // Update average if necessary
-                    if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage 
-                        && ((_currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0) || _blobDetectionParams.BackgroundBitmap == _blobDetectionParams.AverageBitmap))
+                    //if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage 
+                    //    && ((_currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0) || _blobDetectionParams.BackgroundBitmap == _blobDetectionParams.AverageBitmap))
+                    //{                        
+                    //    _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
+                    //    _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
+                    //}
+
+                    if (_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
                     {
-                        _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
-                        _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
+                        if (_currentFrame % 10 == 0)
+                        {
+                            avgFrame.AddFrame(frame);
+                            _blobDetectionParams.AverageBitmap = avgFrame.GetAverageBitmap();
+                        }
                     }
 
                     var image = BlobDetection.GetResultImage(frame, _blobDetectionParams, out countedPeople);
