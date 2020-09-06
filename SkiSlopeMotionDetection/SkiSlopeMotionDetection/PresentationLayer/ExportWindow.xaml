@@ -24,6 +24,6 @@
         </GroupBox>
         
         <!-- Export Button -->
-        <Button Content="Export" Grid.Row="1" Click="ExportButton_Click" IsEnabled="False" Width="150" Height="40"/>
+        <Button Content="Export" Grid.Row="1" Click="ExportButton_Click" Width="150" Height="40"/>
     </Grid>
 </Window>

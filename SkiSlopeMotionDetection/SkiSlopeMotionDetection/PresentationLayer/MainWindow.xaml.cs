@@ -115,6 +115,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _blobDetectionParameters; }
             set { _blobDetectionParameters = value; NotifyPropertyChanged(); }
         }
+        public Bitmap CurrentFrame
+        {
+            get { return videoControl.Image.Bitmap; }
+        }
 
         #endregion
 
@@ -169,10 +173,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var exportWindow = new ExportWindow();
-            exportWindow.Owner = GetWindow(this);
+            var exportWindow = new ExportWindow(BlobDetectionParameters)
+            {
+                Owner = GetWindow(this)
+            };
 
-            exportWindow.Show();
+            exportWindow.ShowDialog();
         }
 
         private void PlayPauseButton_Click(object sender, RoutedEventArgs e)

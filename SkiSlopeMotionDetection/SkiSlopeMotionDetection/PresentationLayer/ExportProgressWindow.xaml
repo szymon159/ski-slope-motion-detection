@@ -1,0 +1,19 @@
+﻿<Window x:Class="SkiSlopeMotionDetection.PresentationLayer.ExportProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        Title="Exporting" Height="100" Width="300" Background="LightGray" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Topmost="True">
+    <Grid HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Content="Please wait, export in progress" Margin="0,5,0,0"/>
+        <ProgressBar Grid.Row="1" Value="{Binding ProgressValue}" Margin="5"/>
+    </Grid>
+</Window>
