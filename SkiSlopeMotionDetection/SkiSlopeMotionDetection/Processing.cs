@@ -1,12 +1,6 @@
-﻿using Emgu.CV;
-using Emgu.CV.Features2D;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace SkiSlopeMotionDetection
 {

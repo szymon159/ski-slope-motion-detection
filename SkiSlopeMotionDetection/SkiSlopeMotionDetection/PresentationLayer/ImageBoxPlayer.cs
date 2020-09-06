@@ -1,26 +1,19 @@
-﻿using Accord;
-using Accord.Math;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using Emgu.CV.UI;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
     public class ImageBoxPlayer : ImageBox
     {
+        #region Private variables
+
         private string _source;
         private int _currentFrame;
         private FrameReaderSingleton _frameReader;
@@ -28,30 +21,36 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private long _frameCount;
         private double _frameRate;
         private double _frameTime;
+        private BlobDetectionParameters _blobDetectionParams;
+
+        #endregion
+
+        #region Properties
 
         public Action MediaOpened { get; set; }
         public Action MediaEnded { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
-        public bool UseOriginalRefreshRate { get; set; } = true;
-        public Bitmap BackgroundBitmap { get; set; }
-        public bool EnableBlobMarking { get; set; }
+        public bool UseOriginalRefreshRate { get; set; } = false;
+
         public string Source
         {
             get { return _source; }
             set { _source = value; SourceUpdated(); }
         }
 
+        #endregion
+
+        #region Public methods
+
         public ImageBoxPlayer()
         {
             _frameReaderWorker = new BackgroundWorker()
             {
-                //WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
             _frameReaderWorker.DoWork += FrameReaderWorker_DoWork;
             _frameReaderWorker.RunWorkerCompleted += FrameReaderWorker_RunWorkerCompleted;
-            //_worker.ProgressChanged += _worker_ProgressChanged;
         }
 
         public void Play()
@@ -91,15 +90,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         //        _currentFrame++;
         //}
 
-        //public void SetFrameContent(BitmapImage bitmapImage, bool pauseVideo = false)
-        //{
-        //    if(pauseVideo)
-        //        Pause();
-
-        //    Image = new Image<Bgr, Byte>(new Bitmap(bitmapImage.StreamSource));
-        //    Invalidate();
-        //}
-
         public void SetFrameContent(Bitmap bitmap, bool pauseVideo = false)
         {
             if (pauseVideo)
@@ -108,6 +98,15 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             Image = new Image<Bgr, Byte>(bitmap);
             Invalidate();
         }
+
+        public void UpdateBlobDetectionParameters(BlobDetectionParameters blobDetectionParameters)
+        {
+            _blobDetectionParams = blobDetectionParameters;
+        }
+
+        #endregion
+
+        #region Private methods
 
         private void SourceUpdated()
         {
@@ -126,11 +125,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var frame = _frameReader.GetFrame(0);
             SetFrameContent(frame);
         }
-
-        //private void _worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        //{
-        //    throw new NotImplementedException();
-        //}
 
         private void FrameReaderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -173,15 +167,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
                 else
                 {
-                    // TODO: Parametrize params :) 
-                    var detectionParams = new BlobDetectionParameters()
-                    {
-                        DetectionMethod = DetectionMethod.DiffWithAverage,
-                        AverageBitmap = BackgroundBitmap,
-                        BlobDetectionOptions = new EmguBlobDetectionOptions(80),
-                        MarkBlobs = EnableBlobMarking
-                    };
-                    var image = BlobDetection.GetResultImage(frame, detectionParams, out countedPeople);
+                    var image = BlobDetection.GetResultImage(frame, _blobDetectionParams, out countedPeople);
 
                     SetFrameContent(image);
                 }
@@ -201,5 +187,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 _currentFrame++;
             }
         }
+
+        #endregion
+
     }
 }
