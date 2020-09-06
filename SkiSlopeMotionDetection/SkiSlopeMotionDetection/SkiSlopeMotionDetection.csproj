@@ -102,6 +102,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="AverageFrame.cs" />
     <Compile Include="BlobDetection.cs" />
     <Compile Include="BlobDetectionParameters.cs" />
     <Compile Include="EmguBlobDetectionOptions.cs" />
