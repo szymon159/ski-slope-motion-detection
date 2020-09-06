@@ -15,9 +15,15 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     /// </summary>
     public partial class ExportWindow : Window, INotifyPropertyChanged
     {
+        #region Private variables
+
         private ExportSettings _settings;
         private BackgroundWorker _exportWorker;
         private ExportProgressWindow _exportProgressWindow;
+
+        #endregion
+
+        #region Properties
 
         public ExportSettings ExportSettings 
         { 
@@ -25,11 +31,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             set { _settings = value; NotifyPropertyChanged(); }
         }
 
+        #endregion
+
+        #region Event handlers
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
+
+        #region Public methods
 
         public ExportWindow(bool exportEntireVideo = false, bool includeMarking = true)
         {
@@ -46,6 +60,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _exportWorker.RunWorkerCompleted += ExportWorker_RunWorkerCompleted;
             _exportWorker.ProgressChanged += ExportWorker_ProgressChanged;
         }
+
+        #endregion
+
+        #region Private methods
 
         private void ExportWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -142,5 +160,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
         }
+
+        #endregion
     }
 }
