@@ -107,6 +107,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _exportProgressWindow.Close();
+
+            if (e.Error != null)
+                throw e.Error;
+
             Close();
         }
 
