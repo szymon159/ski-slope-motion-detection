@@ -3,10 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer" xmlns:emgu="clr-namespace:Emgu.CV.UI;assembly=Emgu.CV.UI"
+        xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
         Title="Ski Slope Motion Detection" Height="720" Width="1280" Background="LightGray">
+    <Window.Resources>
+        <local:EnumBooleanConverter x:Key="enumBooleanConverter" />
+    </Window.Resources>
     <DockPanel>
         <!-- Menu -->
         <Menu DockPanel.Dock="Top" FontSize="14">
@@ -161,11 +164,11 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <GroupBox Header="Method" Grid.Row="0" Margin="10">
+                        <GroupBox Header="Method" Grid.Row="0" Margin="5 5 5 10">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <RadioButton Content="Difference with background"/>
-                                <RadioButton Content="Difference with average frame"/>
-                                <RadioButton Content="Naive method" IsEnabled="False"/>
+                                <RadioButton Content="Difference with background" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithBackground}" Margin="10 10 10 5"/>
+                                <RadioButton Content="Difference with average frame"  IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithAverage}" Margin="10 5 10 5"/>
+                                <RadioButton Content="Naive method" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Naive}" IsEnabled="False" Margin="10 5 10 10"/>
                             </StackPanel>
                         </GroupBox>
                     </Grid>

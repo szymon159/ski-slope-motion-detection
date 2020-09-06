@@ -4,7 +4,7 @@ namespace SkiSlopeMotionDetection
 {
     public class BlobDetectionParameters
     {
-        public DetectionMethod? DetectionMethod { get; set; }
+        public DetectionMethod DetectionMethod { get; set; }
         public int? AvgRangeBegin { get; set; }
         public int? AvgRangeEnd { get; set; }
         public bool MarkBlobs { get; set; } = true;
