@@ -107,6 +107,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _exportProgressWindow.Close();
+
+            if (e.Error != null)
+                MessageBox.Show(e.Error.Message, "Invalid argument", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
             Close();
         }
 
@@ -152,7 +156,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var extension = Path.GetExtension(outputFileName);
             Bitmap currentFrame;
 
-            if(!ExportSettings.IncludeMarking)
+            if (!ExportSettings.IncludeMarking)
             {
                 var reader = FrameReaderSingleton.GetInstance();
                 currentFrame = reader.GetFrame(mainWindow.CurrentFrameNumber);

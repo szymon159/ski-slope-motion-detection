@@ -129,8 +129,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void FrameReaderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsVideoPlaying = false;
-            
-            if(!e.Cancelled)
+
+            if (e.Error != null)
+                MessageBox.Show(e.Error.Message, "Invalid argument", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            if (!e.Cancelled)
                 MediaEnded?.Invoke();
         }
 
