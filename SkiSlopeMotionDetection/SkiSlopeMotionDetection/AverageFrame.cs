@@ -20,6 +20,10 @@ namespace SkiSlopeMotionDetection
 
         private int frameHeight;
 
+        private bool hasChanged = true;
+
+        private Bitmap lastAverage = null;
+
         public AverageFrame(int frameWidth, int frameHeight)
         {
             this.frameWidth = frameWidth;
@@ -36,45 +40,51 @@ namespace SkiSlopeMotionDetection
 
         public Bitmap GetAverageBitmap()
         {
-            Bitmap returnBitmap = new Bitmap(frameWidth, frameHeight);
-            unsafe
+            if (hasChanged)
             {
-                BitmapData bitmapData = returnBitmap.LockBits(new Rectangle(0, 0, returnBitmap.Width, returnBitmap.Height), ImageLockMode.ReadWrite, returnBitmap.PixelFormat);
-
-                int bytesPerPixel = Image.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
-                int heightInPixels = bitmapData.Height;
-                int widthInBytes = bitmapData.Width * bytesPerPixel;
-                byte* PtrFirstPixel = (byte*)bitmapData.Scan0;
-
-                int frameCount = bitmaps.Count;
-
-                Parallel.For(0, heightInPixels, y =>
+                Bitmap returnBitmap = new Bitmap(frameWidth, frameHeight);
+                unsafe
                 {
-                    byte* currentLine = PtrFirstPixel + (y * bitmapData.Stride);
-                    for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
-                    {
-                        int index = x / bytesPerPixel;
-                        currentLine[x] = (byte)(mean[index, y].Item1 / frameCount);
-                        currentLine[x + 1] = (byte)(mean[index, y].Item2 / frameCount);
-                        currentLine[x + 2] = (byte)(mean[index, y].Item3 / frameCount);
-                    }
-                });
-                returnBitmap.UnlockBits(bitmapData);
-            }
+                    BitmapData bitmapData = returnBitmap.LockBits(new Rectangle(0, 0, returnBitmap.Width, returnBitmap.Height), ImageLockMode.ReadWrite, returnBitmap.PixelFormat);
 
-            return returnBitmap;
+                    int bytesPerPixel = Image.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
+                    int heightInPixels = bitmapData.Height;
+                    int widthInBytes = bitmapData.Width * bytesPerPixel;
+                    byte* PtrFirstPixel = (byte*)bitmapData.Scan0;
+
+                    int frameCount = bitmaps.Count;
+
+                    Parallel.For(0, heightInPixels, y =>
+                    {
+                        byte* currentLine = PtrFirstPixel + (y * bitmapData.Stride);
+                        for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
+                        {
+                            int index = x / bytesPerPixel;
+                            currentLine[x] = (byte)(mean[index, y].Item1 / frameCount);
+                            currentLine[x + 1] = (byte)(mean[index, y].Item2 / frameCount);
+                            currentLine[x + 2] = (byte)(mean[index, y].Item3 / frameCount);
+                        }
+                    });
+                    returnBitmap.UnlockBits(bitmapData);
+                }
+                hasChanged = false;
+                lastAverage = returnBitmap;
+                return returnBitmap;
+            }
+            return lastAverage;
         }
 
         public void AddFrame(Bitmap bitmap)
         {
-            if(bitmaps.Count >= DesiredSize)
+            hasChanged = true;
+            if (bitmaps.Count >= DesiredSize)
             {
                 DeleteFrameFromMean(bitmaps.First.Value);
                 bitmaps.RemoveFirst();
             }
 
             bitmaps.AddLast(bitmap);
-            AddFrameToMean(bitmap);
+            AddFrameToMean(bitmap);           
         }
 
         private void DeleteFrameFromMean(Bitmap bitmap)
