@@ -73,16 +73,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             {
                 for(int j=0; j<blobrange; j++)
                 {
-                    for (int k = 0; j < blobrange; k++)
+                    for (int k = 0; k < blobrange; k++)
                     {
                         double dist = Math.Sqrt(Math.Pow(-blobrange + k, 2) + Math.Pow(-j + k, 2));
                         double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
-                        if (i - blobrange + k > Series.Data.GetLength(0) || i - j + k > Series.Data.GetLength(1)) break;
-                        if (i - j + k < 0 || i - blobrange + k < 0) continue;
-                        Series.Data[(int)keyPoints[i - blobrange + k].Point.X, (int)keyPoints[i - j + k].Point.Y] += val;
+                        if ((int)keyPoints[i].Point.X - blobrange + k > Series.Data.GetLength(0) || (int)keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
+                        if ((int)keyPoints[i].Point.Y - j + k < 0 || (int)keyPoints[i].Point.X - blobrange + k < 0) continue;
+                        Series.Data[(int)keyPoints[i].Point.X - blobrange + k, (int)keyPoints[i].Point.Y - j + k] += val;
                     }
                 }
             }
+            heatMap.InvalidatePlot(true);
         }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")

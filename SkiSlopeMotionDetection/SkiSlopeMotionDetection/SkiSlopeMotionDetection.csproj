@@ -37,6 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
@@ -110,7 +111,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="BlobDetection.cs" />
-    <Compile Include="BlobDetectionOptions.cs" />
+    <Compile Include="BlobDetectionParameters.cs" />
+    <Compile Include="EmguBlobDetectionOptions.cs" />
+    <Compile Include="DetectionMethod.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
     <Compile Include="Heatmap.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
@@ -123,6 +126,10 @@
     </Compile>
     <Compile Include="PresentationLayer\HeatmapWindow.xaml.cs">
       <DependentUpon>HeatmapWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PresentationLayer\FrameData.cs" />
+    <Compile Include="PresentationLayer\ImageBoxPlayer.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="PresentationLayer\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

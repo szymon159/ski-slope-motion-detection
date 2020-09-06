@@ -6,13 +6,13 @@ namespace SkiSlopeMotionDetection
 {
     static class Processing
     {
-        public static Bitmap GetAverage(int frameCount,int startFrame)
+        public static Bitmap GetAverage(int frameCount, int startFrame)
         {
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
             (double, double, double)[,] mean = new (double, double, double)[reader.FrameWidth, reader.FrameHeight];
             for (int i = 0; i < frameCount; i++)
             {
-                Bitmap frame = reader.GetFrame(startFrame+i);
+                Bitmap frame = reader.GetFrame(startFrame + i);
                 unsafe
                 {
                     BitmapData bitmapData = frame.LockBits(new Rectangle(0, 0, frame.Width, frame.Height), ImageLockMode.ReadWrite, frame.PixelFormat);
@@ -45,7 +45,7 @@ namespace SkiSlopeMotionDetection
             {
                 BitmapData bitmapData = returnBitmap.LockBits(new Rectangle(0, 0, returnBitmap.Width, returnBitmap.Height), ImageLockMode.ReadWrite, returnBitmap.PixelFormat);
 
-                int bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
+                int bytesPerPixel = Image.GetPixelFormatSize(returnBitmap.PixelFormat) / 8;
                 int heightInPixels = bitmapData.Height;
                 int widthInBytes = bitmapData.Width * bytesPerPixel;
                 byte* PtrFirstPixel = (byte*)bitmapData.Scan0;
@@ -56,8 +56,8 @@ namespace SkiSlopeMotionDetection
                     for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
                     {
                         currentLine[x] = (byte)mean[x / bytesPerPixel, y].Item1;
-                        currentLine[x+1] = (byte)mean[x / bytesPerPixel, y].Item2;
-                        currentLine[x+2] = (byte)mean[x / bytesPerPixel, y].Item3;
+                        currentLine[x + 1] = (byte)mean[x / bytesPerPixel, y].Item2;
+                        currentLine[x + 2] = (byte)mean[x / bytesPerPixel, y].Item3;
                     }
                 });
                 returnBitmap.UnlockBits(bitmapData);

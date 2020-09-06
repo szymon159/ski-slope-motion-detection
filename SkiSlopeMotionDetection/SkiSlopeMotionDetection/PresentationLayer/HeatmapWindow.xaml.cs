@@ -31,17 +31,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             set { heatmap = value; NotifyPropertyChanged(); }
         }
 
-        public HeatmapWindow(int width, int height)
+        public HeatmapWindow(int width, int height, int startFrame, int frameCount)
         {
-            heatmap = new Heatmap(width, height);
-            Bitmap bm = Processing.GetAverage(400, 1000);
+            Heatmap = new Heatmap(width, height);
+            Bitmap bm = Processing.GetAverage(frameCount, startFrame);
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
-            for (int i=0; i<100; i++)
+            for (int i=0; i<25; i++)
             {
                 Bitmap bm2 = reader.GetFrame(900+i);
                 Bitmap bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
 
-                BlobDetectionOptions opts = new BlobDetectionOptions(80);
+                EmguBlobDetectionOptions opts = new EmguBlobDetectionOptions(80);
                 Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
                 Heatmap.UpdateSeries(mKeys);
             }

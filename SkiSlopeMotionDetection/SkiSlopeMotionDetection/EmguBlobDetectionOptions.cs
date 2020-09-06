@@ -2,7 +2,7 @@
 
 namespace SkiSlopeMotionDetection
 {
-    public class BlobDetectionOptions
+    public class EmguBlobDetectionOptions
     {
         public int BlobColor { get; set; }
         public bool FilterByColor { get; set; }
@@ -23,7 +23,7 @@ namespace SkiSlopeMotionDetection
         public int MinArea { get; set; }
         public int MaxArea { get; set; }
     
-        public BlobDetectionOptions(int minArea = 50)
+        public EmguBlobDetectionOptions(int minArea = 50)
         {
             // Set defaults
 
