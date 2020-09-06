@@ -102,6 +102,7 @@
     <Compile Include="BlobDetectionParameters.cs" />
     <Compile Include="EmguBlobDetectionOptions.cs" />
     <Compile Include="DetectionMethod.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="FrameReaderSingleton.cs" />
     <Compile Include="PresentationLayer\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

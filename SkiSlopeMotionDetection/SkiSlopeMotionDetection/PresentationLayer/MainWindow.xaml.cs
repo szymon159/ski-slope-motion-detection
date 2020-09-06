@@ -116,6 +116,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _blobDetectionParameters; }
             set { _blobDetectionParameters = value; NotifyPropertyChanged(); }
         }
+        public Bitmap CurrentFrame
+        {
+            get { return videoControl.Image.Bitmap; }
+        }
 
         #endregion
 
