@@ -171,7 +171,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             var exportWindow = new ExportWindow();
-            exportWindow.Owner = Window.GetWindow(this);
+            exportWindow.Owner = GetWindow(this);
 
             exportWindow.Show();
         }
@@ -284,7 +284,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             {
                 DetectionMethod = DetectionMethod.DiffWithBackground,
                 AvgRangeBegin = 400,
-                AvgRangeEnd = 1000,
+                AvgFramesCount = 600,
                 BlobDetectionOptions = new EmguBlobDetectionOptions(80)
             };
             var image = BlobDetection.GetResultImage(source, detectionParams, out int countedPeople);

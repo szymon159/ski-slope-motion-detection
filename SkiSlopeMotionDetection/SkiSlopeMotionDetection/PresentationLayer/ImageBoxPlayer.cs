@@ -142,6 +142,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if(_frameReader == null)
                 throw new ArgumentException("Unable to fetch next frame. Frame reader has not been set");
 
+            if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
+            {
+                _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
+                _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
+            }
+
             while (_currentFrame < _frameCount)
             {
                 var startTime = DateTime.Now;
@@ -167,6 +173,13 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
                 else
                 {
+                    // Update average if necessary
+                    if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage && _currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0)
+                    {
+                        _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
+                        _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
+                    }
+
                     var image = BlobDetection.GetResultImage(frame, _blobDetectionParams, out countedPeople);
 
                     SetFrameContent(image);

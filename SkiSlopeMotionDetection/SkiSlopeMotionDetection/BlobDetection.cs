@@ -66,6 +66,7 @@ namespace SkiSlopeMotionDetection
             switch (detectionParams.DetectionMethod)
             {
                 case DetectionMethod.DiffWithBackground:
+                case DetectionMethod.DiffWithAverage:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
@@ -77,17 +78,10 @@ namespace SkiSlopeMotionDetection
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
 
-            Bitmap average = detectionParams.AverageBitmap;
-            if(average == null)
-            {
-                if (!detectionParams.AvgRangeBegin.HasValue || !detectionParams.AvgRangeEnd.HasValue)
-                    throw new ArgumentException("Unable to get average frame, either bitmap or ranges have to be specified");
+            if (detectionParams.AverageBitmap == null)
+                throw new ArgumentException("Unable to get difference, no image to compare");
 
-                var framesCount = detectionParams.AvgRangeEnd.Value - detectionParams.AvgRangeBegin.Value + 1;
-                average = Processing.GetAverage(framesCount, detectionParams.AvgRangeBegin.Value);
-            }
-
-            Bitmap difference = (GetDifference(average, sourceBitmap, detectionParams.DifferenceThreshold)).ToBitmap();
+            Bitmap difference = GetDifference(detectionParams.AverageBitmap, sourceBitmap, detectionParams.DifferenceThreshold).ToBitmap();
             MKeyPoint[] mKeys = ReturnBlobs(difference, detectionParams.BlobDetectionOptions);
             blobsCount = mKeys.Length;
 
