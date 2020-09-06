@@ -174,10 +174,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var exportWindow = new ExportWindow();
-            exportWindow.Owner = Window.GetWindow(this);
+            var exportWindow = new ExportWindow(BlobDetectionParameters)
+            {
+                Owner = GetWindow(this)
+            };
 
-            exportWindow.Show();
+            exportWindow.ShowDialog();
         }
 
         private void PlayPauseButton_Click(object sender, RoutedEventArgs e)

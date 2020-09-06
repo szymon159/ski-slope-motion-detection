@@ -20,6 +20,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private ExportSettings _settings;
         private BackgroundWorker _exportWorker;
         private ExportProgressWindow _exportProgressWindow;
+        private BlobDetectionParameters _blobDetectionParameters;
 
         #endregion
 
@@ -45,11 +46,13 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         #region Public methods
 
-        public ExportWindow(bool exportEntireVideo = false, bool includeMarking = true)
+        public ExportWindow(BlobDetectionParameters blobDetectionParameters, bool exportEntireVideo = false, bool includeMarking = true)
         {
             InitializeComponent();
 
             ExportSettings = new ExportSettings(exportEntireVideo, includeMarking);
+
+            _blobDetectionParameters = blobDetectionParameters;
 
             _exportWorker = new BackgroundWorker()
             {
@@ -76,9 +79,24 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 if (!writer.IsOpen)
                     throw new ArgumentException("Unable to open file for writing");
                
-                for (int i = 0; i < 500; i++)
+                for (int i = 0; i < reader.FrameCount; i++)
                 {
-                    writer.WriteVideoFrame(reader.GetFrame(i));
+                    if (_exportWorker.CancellationPending)
+                        break;
+
+                    Bitmap frame = reader.GetFrame(i);
+
+                    if(ExportSettings.IncludeMarking)
+                    {
+                        // Hack to prevent from deep copy of _blobDetectionParameters
+                        var temp = _blobDetectionParameters.MarkBlobs;
+
+                        _blobDetectionParameters.MarkBlobs = true;
+                        frame = BlobDetection.GetResultImage(frame, _blobDetectionParameters, out _);
+                        _blobDetectionParameters.MarkBlobs = temp;
+                    }
+
+                    writer.WriteVideoFrame(frame);
 
                     var progress = 100 * i / (double)reader.FrameCount;
                     _exportWorker.ReportProgress((int)progress);
@@ -89,8 +107,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _exportProgressWindow.Close();
-
-            Owner = null;
             Close();
         }
 
@@ -148,13 +164,15 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             currentFrame.Save(outputFileName, extension.ToImageFormat());
 
-            Owner = null;
             Close();
         }
 
         private void ExportVideo(string outputFileName)
         {
-            _exportProgressWindow = new ExportProgressWindow();
+            _exportProgressWindow = new ExportProgressWindow
+            {
+                Owner = GetWindow(this)
+            };
 
             _exportWorker.RunWorkerAsync(outputFileName);
             if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
