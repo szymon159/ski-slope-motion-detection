@@ -131,9 +131,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             IsVideoPlaying = false;
 
             if (e.Error != null)
-                throw e.Error;
-            
-            if(!e.Cancelled)
+                MessageBox.Show(e.Error.Message, "Invalid argument", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            if (!e.Cancelled)
                 MediaEnded?.Invoke();
         }
 
