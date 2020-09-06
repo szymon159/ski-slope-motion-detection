@@ -71,15 +71,26 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             int blobrange = 5;
             for(int i=0; i<keyPoints.Count(); i++)
             {
-                for(int j=0; j<blobrange; j++)
+                for(int j=0; j<blobrange+1; j++)
+                {
+                    for (int k = 0; k < blobrange+1; k++)
+                    {
+                        double dist = Math.Sqrt(Math.Pow(-blobrange + j + k, 2) + Math.Pow(-j + k, 2));
+                        double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
+                        if (keyPoints[i].Point.X - blobrange + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
+                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobrange + j + k < 0) continue;
+                        Series.Data[(int)keyPoints[i].Point.X - blobrange + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                    }
+                }
+                for (int j = 0; j < blobrange; j++)
                 {
                     for (int k = 0; k < blobrange; k++)
                     {
-                        double dist = Math.Sqrt(Math.Pow(-blobrange + k, 2) + Math.Pow(-j + k, 2));
+                        double dist = Math.Sqrt(Math.Pow(-blobrange +1 + j + k, 2) + Math.Pow(-j + k, 2));
                         double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
-                        if ((int)keyPoints[i].Point.X - blobrange + k > Series.Data.GetLength(0) || (int)keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
-                        if ((int)keyPoints[i].Point.Y - j + k < 0 || (int)keyPoints[i].Point.X - blobrange + k < 0) continue;
-                        Series.Data[(int)keyPoints[i].Point.X - blobrange + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                        if (keyPoints[i].Point.X - blobrange +1 + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
+                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobrange +1 + j + k < 0) continue;
+                        Series.Data[(int)keyPoints[i].Point.X - blobrange +1 + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
                     }
                 }
             }

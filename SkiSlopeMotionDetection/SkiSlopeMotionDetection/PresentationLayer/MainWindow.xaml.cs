@@ -279,7 +279,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
             var reader = FrameReaderSingleton.GetInstance();
-            var heatMapWindow = new HeatmapWindow(reader.FrameWidth, reader.FrameHeight, 900, 50)
+            var heatMapWindow = new HeatmapWindow(reader.FrameWidth, reader.FrameHeight)
             {
                 Owner = GetWindow(this)
             };
