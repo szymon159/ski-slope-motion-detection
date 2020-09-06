@@ -24,10 +24,11 @@ namespace SkiSlopeMotionDetection
 
         private Bitmap lastAverage = null;
 
-        public AverageFrame(int frameWidth, int frameHeight)
+        public AverageFrame()
         {
-            this.frameWidth = frameWidth;
-            this.frameHeight = frameHeight;
+            var reader = FrameReaderSingleton.GetInstance();
+            this.frameWidth = reader.FrameWidth;
+            this.frameHeight = reader.FrameHeight;
             mean = new (long, long, long)[frameWidth, frameHeight];
             for (int i = 0; i < frameWidth; i++)
             {

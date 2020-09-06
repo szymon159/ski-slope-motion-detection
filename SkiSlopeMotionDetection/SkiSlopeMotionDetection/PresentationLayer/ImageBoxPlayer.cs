@@ -118,6 +118,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _frameTime = 1000 / _frameRate;
             _currentFrame = 0;
 
+            avgFrame = new AverageFrame();
+
             DisplayFirstFrame();
             MediaOpened?.Invoke(); 
         }
@@ -164,11 +166,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
 
                 var frame = _frameReader.GetFrame(_currentFrame);
-
-                if(_currentFrame == 0)
-                {
-                    avgFrame = new AverageFrame(frame.Width, frame.Height);
-                }
 
                 // If using original refresh rate, just display the video without running computations
                 if(UseOriginalRefreshRate)
