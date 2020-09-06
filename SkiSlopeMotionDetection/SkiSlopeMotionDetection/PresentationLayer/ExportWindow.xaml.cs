@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using Accord.Math;
+using Accord.Video.FFMPEG;
+using Microsoft.Win32;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -14,6 +16,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     public partial class ExportWindow : Window, INotifyPropertyChanged
     {
         private ExportSettings _settings;
+        private BackgroundWorker _exportWorker;
+        private ExportProgressWindow _exportProgressWindow;
 
         public ExportSettings ExportSettings 
         { 
@@ -32,11 +36,56 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             InitializeComponent();
 
             ExportSettings = new ExportSettings(exportEntireVideo, includeMarking);
+
+            _exportWorker = new BackgroundWorker()
+            {
+                WorkerSupportsCancellation = true,
+                WorkerReportsProgress = true
+            };
+            _exportWorker.DoWork += ExportWorker_DoWork;
+            _exportWorker.RunWorkerCompleted += ExportWorker_RunWorkerCompleted;
+            _exportWorker.ProgressChanged += ExportWorker_ProgressChanged;
+        }
+
+        private void ExportWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var outputFileName = e.Argument as string;
+            var reader = FrameReaderSingleton.GetInstance();
+
+            using (var writer = new VideoFileWriter())
+            {
+                writer.Open(outputFileName, reader.FrameWidth, reader.FrameHeight, new Rational(reader.FrameRate), VideoCodec.Default);
+                if (!writer.IsOpen)
+                    throw new ArgumentException("Unable to open file for writing");
+               
+                for (int i = 0; i < 500; i++)
+                {
+                    writer.WriteVideoFrame(reader.GetFrame(i));
+
+                    var progress = 100 * i / (double)reader.FrameCount;
+                    _exportWorker.ReportProgress((int)progress);
+                }
+            }
+        }
+
+        private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            _exportProgressWindow.Close();
+
+            Owner = null;
+            Close();
+        }
+
+        private void ExportWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            _exportProgressWindow.ProgressValue = e.ProgressPercentage;
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var videoFilter = "Video files (*.mp4;*.avi)|*.mp4;*.avi";
+            var videoFilter = 
+                "MP4 video file (*.mp4)|*.mp4|" +
+                "Audio Video Interleave (*.avi)|*.avi";
             
             var imageFilter = 
                 "Bitmap (*.bmp)|*.bmp|" +
@@ -54,10 +103,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                ExportFrame(saveFileDialog.FileName);
-
-                Owner = null;
-                Close();
+                if (ExportSettings.ExportSelectedFrame)
+                    ExportFrame(saveFileDialog.FileName);
+                else
+                    ExportVideo(saveFileDialog.FileName);
             }
         }
 
@@ -80,6 +129,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             }
 
             currentFrame.Save(outputFileName, extension.ToImageFormat());
+
+            Owner = null;
+            Close();
+        }
+
+        private void ExportVideo(string outputFileName)
+        {
+            _exportProgressWindow = new ExportProgressWindow();
+
+            _exportWorker.RunWorkerAsync(outputFileName);
+            if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+                _exportWorker.CancelAsync();
         }
     }
 }
