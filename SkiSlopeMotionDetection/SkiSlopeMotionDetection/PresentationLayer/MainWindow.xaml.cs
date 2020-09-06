@@ -68,12 +68,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool MarkPeopleOnPausedFrame
         {
             get { return !_blobDetectionParameters.MarkBlobs; }
-            set { _blobDetectionParameters.MarkBlobs = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); NotifyPropertyChanged("BlobDetectionParameters"); }
+            set { _blobDetectionParameters.MarkBlobs = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
         }
         public bool MarkPeopleOnEachFrame
         {
             get { return _blobDetectionParameters.MarkBlobs; }
-            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); NotifyPropertyChanged("BlobDetectionParameters"); }
+            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
@@ -101,7 +101,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool IsBackgroundImageLoaded
         {
             get { return _isBackgroundImageLoaded; }
-            set { _isBackgroundImageLoaded = value; NotifyPropertyChanged("BackgroundImageLoadedLabel"); NotifyPropertyChanged("BackgroundImageLoadedLabelColor"); NotifyPropertyChanged("BlobDetectionParameters"); }
+            set { _isBackgroundImageLoaded = value; NotifyPropertyChanged("BackgroundImageLoadedLabel"); NotifyPropertyChanged("BackgroundImageLoadedLabelColor"); }
         }
         public string BackgroundImageLoadedLabel
         {
@@ -234,6 +234,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             PropertyChanged += MainWindow_PropertyChanged;
             InitializeComponent();
+
+            videoControl.UpdateBlobDetectionParameters(BlobDetectionParameters);
         }
 
         #region Private methods
@@ -250,9 +252,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     var reader = FrameReaderSingleton.GetInstance();
                     var frame = reader.GetFrame(CurrentFrameNumber);
 
-                    var detectionParams = BlobDetectionParameters;
-                    detectionParams.MarkBlobs = true;
-                    var image = BlobDetection.GetResultImage(frame, detectionParams, out int countedPeople);
+                    BlobDetectionParameters.MarkBlobs = true;
+                    var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
+                    BlobDetectionParameters.MarkBlobs = false;
                     CountedPeople = countedPeople;
 
                     videoControl.SetFrameContent(image);
