@@ -89,17 +89,8 @@ namespace SkiSlopeMotionDetection
                 Mat imWithKeypoints = new Mat();
                 Image<Bgr, byte> im2 = new Image<Bgr, byte>(sourceBitmap);
                 Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), imWithKeypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
-                MemoryStream ms = new MemoryStream();
 
-                Bitmap final = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
-                final.Save(ms, ImageFormat.Bmp);
-                var image = new BitmapImage();
-                image.BeginInit();
-                ms.Seek(0, SeekOrigin.Begin);
-                image.StreamSource = ms;
-                image.EndInit();
-
-                result = new Bitmap(image.StreamSource);
+                result = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
             }
 
             return result;
