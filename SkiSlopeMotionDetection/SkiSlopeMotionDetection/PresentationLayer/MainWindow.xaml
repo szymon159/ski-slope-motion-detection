@@ -156,11 +156,15 @@
                 <GroupBox Header="Settings" Grid.Row="2" Margin="5 5 5 10">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="50"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="130"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
@@ -176,29 +180,34 @@
                                 <RadioButton Content="Naive method" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Naive}" Margin="10 5 10 10"/>
                             </StackPanel>
                         </GroupBox>
-                        <TextBlock Grid.Row="1" Grid.Column="0"
-                                       Text="{Binding Path=Value, ElementName=HueSlider, StringFormat=Hue: {0}}" />
-                        <Slider Grid.Row="1" Grid.Column="1"
+                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="20 0 0 0" Text="HSV Hue:" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center"
+                                       Text="{Binding Path=Value, ElementName=HueSlider}" />
+                        <Slider Grid.Row="2" Grid.Column="1"
                                     x:Name="HueSlider" Minimum="0" Maximum="180" SmallChange="1" LargeChange="5" TickFrequency="10"
                                     Value="{Binding HueHSV}"/>
-                        <TextBlock Grid.Row="2" Grid.Column="0"
-                                       Text="{Binding Path=Value, ElementName=StaturationSlider, StringFormat=Satur: {0}}" />
-                        <Slider Grid.Row="2" Grid.Column="1"
+                        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="20 0 0 0" Text="HSV Saturation:" />
+                        <TextBlock Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center"
+                                       Text="{Binding Path=Value, ElementName=StaturationSlider}" />
+                        <Slider Grid.Row="4" Grid.Column="1" 
                                     x:Name="StaturationSlider" Minimum="0" Maximum="255" SmallChange="1" LargeChange="5" TickFrequency="10"
                                     Value="{Binding SaturationHSV}"/>
-                        <TextBlock Grid.Row="3" Grid.Column="0"
-                                       Text="{Binding Path=Value, ElementName=ValueSlider, StringFormat=Value: {0}}" />
-                        <Slider Grid.Row="3" Grid.Column="1"
+                        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="20 0 0 0" Text="HSV Value:" />
+                        <TextBlock Grid.Row="6" Grid.Column="0" HorizontalAlignment="Center"
+                                       Text="{Binding Path=Value, ElementName=ValueSlider}" />
+                        <Slider Grid.Row="6" Grid.Column="1"
                                     x:Name="ValueSlider" Minimum="0" Maximum="255" SmallChange="1" LargeChange="5" TickFrequency="10"
                                     Value="{Binding ValueHSV}"/>
-                        <TextBlock Grid.Row="4" Grid.Column="0"
-                                       Text="{Binding Path=Value, ElementName=MinBlobSlider, StringFormat=MinB: {0}}" />
-                        <Slider Grid.Row="4" Grid.Column="1"
+                        <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="20 0 0 0" Text="Minimum Blob Size:" />
+                        <TextBlock Grid.Row="8" Grid.Column="0" HorizontalAlignment="Center"
+                                       Text="{Binding Path=Value, ElementName=MinBlobSlider}" />
+                        <Slider Grid.Row="8" Grid.Column="1"
                                     x:Name="MinBlobSlider" Minimum="0" Maximum="1000" SmallChange="1" LargeChange="5" TickFrequency="10"
                                     Value="{Binding MinBlob}"/>
-                        <TextBlock Grid.Row="5" Grid.Column="0"
-                                       Text="{Binding Path=Value, ElementName=DiffThreshold, StringFormat=DiffT: {0}}" />
-                        <Slider Grid.Row="5" Grid.Column="1"
+                        <TextBlock Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Margin="20 0 0 0" Text="Difference Threshold:" />
+                        <TextBlock Grid.Row="10" Grid.Column="0" HorizontalAlignment="Center"
+                                       Text="{Binding Path=Value, ElementName=DiffThreshold}" />
+                        <Slider Grid.Row="10" Grid.Column="1"
                                     x:Name="DiffThreshold" Minimum="0" Maximum="100" SmallChange="1" LargeChange="5" TickFrequency="10"
                                     Value="{Binding DifferenceThreshold}"/>
                     </Grid>
