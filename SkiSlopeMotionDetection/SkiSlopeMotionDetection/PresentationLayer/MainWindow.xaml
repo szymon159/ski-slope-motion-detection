@@ -195,7 +195,12 @@
                                        Text="{Binding Path=Value, ElementName=MinBlobSlider, StringFormat=MinB: {0}}" />
                         <Slider Grid.Row="4" Grid.Column="1"
                                     x:Name="MinBlobSlider" Minimum="0" Maximum="1000" SmallChange="1" LargeChange="5" TickFrequency="10"
-                                    Value="{Binding MinBlob, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    Value="{Binding MinBlob}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="0"
+                                       Text="{Binding Path=Value, ElementName=DiffThreshold, StringFormat=DiffT: {0}}" />
+                        <Slider Grid.Row="5" Grid.Column="1"
+                                    x:Name="DiffThreshold" Minimum="0" Maximum="100" SmallChange="1" LargeChange="5" TickFrequency="10"
+                                    Value="{Binding DifferenceThreshold}"/>
                     </Grid>
                 </GroupBox>
                 <Button Content="Test" Click="TestButton_Click"  HorizontalAlignment="Left" Height="25" Margin="10,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50"/>

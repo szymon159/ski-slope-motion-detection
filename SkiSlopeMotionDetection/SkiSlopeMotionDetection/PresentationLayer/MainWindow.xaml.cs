@@ -123,7 +123,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public int HueHSV
         {
             get { return _blobDetectionParameters.HueHSV; }
-            set { _blobDetectionParameters.HueHSV = value; NotifyPropertyChanged("HueHSV"); }
+            set { _blobDetectionParameters.HueHSV = value; NotifyPropertyChanged(); }
         }
 
         public int SaturationHSV
@@ -141,6 +141,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             get { return _blobDetectionParameters.BlobDetectionOptions.MinArea; }
             set { _blobDetectionParameters.BlobDetectionOptions.MinArea = value; NotifyPropertyChanged(); }
+        }
+
+        public int DifferenceThreshold
+        {
+            get { return _blobDetectionParameters.DifferenceThreshold; }
+            set { _blobDetectionParameters.DifferenceThreshold = value; NotifyPropertyChanged(); }
         }
 
         #endregion
