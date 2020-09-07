@@ -23,8 +23,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private double _frameTime;
         private BlobDetectionParameters _blobDetectionParams;
 
-        private AverageFrame avgFrame;
-
         #endregion
 
         #region Properties
@@ -118,8 +116,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _frameTime = 1000 / _frameRate;
             _currentFrame = 0;
 
-            avgFrame = new AverageFrame();
-
             DisplayFirstFrame();
             MediaOpened?.Invoke(); 
         }
@@ -192,8 +188,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     {
                         if (_currentFrame % 10 == 0)
                         {
-                            avgFrame.AddFrame(frame);
-                            _blobDetectionParams.AverageBitmap = avgFrame.GetAverageBitmap();
+                            _blobDetectionParams.AddFrameToAverage = true;
                         }
                     }
 

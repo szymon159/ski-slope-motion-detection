@@ -6,7 +6,6 @@ using Emgu.CV.Util;
 using System;
 using System.Drawing;
 
-
 namespace SkiSlopeMotionDetection
 {
     public static class BlobDetection
@@ -19,7 +18,7 @@ namespace SkiSlopeMotionDetection
             return detector.Detect(img);
         }
 
-        public static MKeyPoint[] ReturnBlobs(Image<Bgr,byte> img, EmguBlobDetectionOptions opt)
+        public static MKeyPoint[] ReturnBlobs(Image<Bgr, byte> img, EmguBlobDetectionOptions opt)
         {
             return ReturnBlobs(img.Mat, opt);
         }
@@ -65,8 +64,10 @@ namespace SkiSlopeMotionDetection
                 case DetectionMethod.DiffWithBackground:
                     detectionParams.AverageBitmap = detectionParams.BackgroundBitmap;
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
+
                 case DetectionMethod.DiffWithAverage:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
+
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
             }
@@ -74,6 +75,14 @@ namespace SkiSlopeMotionDetection
 
         private static Bitmap GetImageByDiffWithAverage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
         {
+            var avgCounter = AverageFrameSingleton.GetInstance();
+            if (detectionParams.AddFrameToAverage)
+            {
+                avgCounter.AddFrame(sourceBitmap);
+                detectionParams.AddFrameToAverage = false;
+            }
+            detectionParams.AverageBitmap = avgCounter.GetAverageBitmap();
+
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
 
