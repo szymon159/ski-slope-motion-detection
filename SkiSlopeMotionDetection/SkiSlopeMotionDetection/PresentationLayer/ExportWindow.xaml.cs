@@ -59,7 +59,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 WorkerSupportsCancellation = true,
                 WorkerReportsProgress = true
             };
-            _exportWorker.DoWork += ExportWorker_DoWork;
             _exportWorker.RunWorkerCompleted += ExportWorker_RunWorkerCompleted;
             _exportWorker.ProgressChanged += ExportWorker_ProgressChanged;
         }
@@ -68,7 +67,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         #region Private methods
 
-        private void ExportWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void ExportWorker_DoWorkVideo(object sender, DoWorkEventArgs e)
         {
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
@@ -104,6 +103,32 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             }
         }
 
+        private void ExportWorker_DoWorkStats(object sender, DoWorkEventArgs e)
+        {
+            var outputFileName = e.Argument as string;
+            var reader = FrameReaderSingleton.GetInstance();
+
+            using (var writer = new StreamWriter(outputFileName))
+            {
+                if (writer == null)
+                    throw new ArgumentException("Unable to open file for writing");
+
+                for (int i = 0; i < reader.FrameCount; i++)
+                {
+                    if (_exportWorker.CancellationPending)
+                        break;
+
+                    Bitmap frame = reader.GetFrame(i);
+                    BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleCount);
+
+                    writer.WriteLine($"Frame {i}: {peopleCount} people");
+
+                    var progress = 100 * i / (double)reader.FrameCount;
+                    _exportWorker.ReportProgress((int)progress);
+                }
+            }
+        }
+
         private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             _exportProgressWindow.Close();
@@ -121,21 +146,37 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var videoFilter = 
-                "MP4 video file (*.mp4)|*.mp4|" +
-                "Audio Video Interleave (*.avi)|*.avi";
-            
-            var imageFilter = 
-                "Bitmap (*.bmp)|*.bmp|" +
-                "Graphics Interchange Format (*.gif)|*.gif|" +
-                "Exchangeable Image File Format (*.exif)|*.exif|" +
-                "JPEG Image (*.jpg)|*.jpg|" +
-                "Portable Network Graphics (*.png)|*.png|" +
-                "Tagged Image File Format (*.tiff)|*.tiff";
+            string filter = "All files (*.*)|*.*";
+            switch (ExportSettings.ExportMode)
+            {
+                case ExportMode.CurrentFrame:
+                    filter = 
+                        "Bitmap (*.bmp)|*.bmp|" +
+                        "Graphics Interchange Format (*.gif)|*.gif|" +
+                        "Exchangeable Image File Format (*.exif)|*.exif|" +
+                        "JPEG Image (*.jpg)|*.jpg|" +
+                        "Portable Network Graphics (*.png)|*.png|" +
+                        "Tagged Image File Format (*.tiff)|*.tiff";
+                    break;
+                case ExportMode.EntireVideo:
+                    filter = 
+                        "MP4 video file (*.mp4)|*.mp4|" +
+                        "Audio Video Interleave (*.avi)|*.avi";
+                    break;
+                case ExportMode.Stats:
+                    filter =
+                        "Text file (*.txt)|*.txt";
+                    break;
+                case ExportMode.Histogram:
+                    break;
+                default:
+                    break;
+            }
+
 
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = ExportSettings.ExportMode == ExportMode.EntireVideo ? videoFilter : imageFilter,
+                Filter = filter,
                 InitialDirectory = Environment.CurrentDirectory
             };
 
@@ -150,6 +191,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                         ExportVideo(saveFileDialog.FileName);
                         break;
                     case ExportMode.Stats:
+                        ExportStats(saveFileDialog.FileName);
                         break;
                     case ExportMode.Histogram:
                         break;
@@ -189,8 +231,22 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 Owner = GetWindow(this)
             };
 
+            _exportWorker.DoWork += ExportWorker_DoWorkVideo;
             _exportWorker.RunWorkerAsync(outputFileName);
             if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+                _exportWorker.CancelAsync();
+        }
+
+        private void ExportStats(string outputFileName)
+        {
+            _exportProgressWindow = new ExportProgressWindow
+            {
+                Owner = GetWindow(this)
+            };
+
+            _exportWorker.DoWork += ExportWorker_DoWorkStats;
+            _exportWorker.RunWorkerAsync(outputFileName);
+            if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
         }
 
