@@ -22,12 +22,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private bool _useOriginalRefreshRate = false;
         private bool _isVideoPaused = true;
         private bool _isVideoLoaded = false;
-        private bool _isVideoEnded = false;
         private bool _isBackgroundImageLoaded = false;
         private BlobDetectionParameters _blobDetectionParameters = new BlobDetectionParameters()
         {
             // TODO: Parametrize
-            DetectionMethod = DetectionMethod.DiffWithAverage,
+            DetectionMethod = DetectionMethod.DiffWithBackground,
             BlobDetectionOptions = new EmguBlobDetectionOptions(80)
         };
 
@@ -65,7 +64,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _useOriginalRefreshRate; }
             set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; if (value) MarkPeopleOnEachFrame = false; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
-        public bool MarkPeopleOnPausedFrame
+        public bool MarkPeopleDisabled
         {
             get { return !_blobDetectionParameters.MarkBlobs; }
             set { _blobDetectionParameters.MarkBlobs = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
@@ -73,7 +72,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool MarkPeopleOnEachFrame
         {
             get { return _blobDetectionParameters.MarkBlobs; }
-            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
+            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleDisabled"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
@@ -95,8 +94,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         }
         public bool IsVideoEnded
         {
-            get { return _isVideoEnded; }
-            set { _isVideoEnded = value; }
+            get;
+            set;
         }
         public bool IsBackgroundImageLoaded
         {
@@ -115,6 +114,39 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             get { return _blobDetectionParameters; }
             set { _blobDetectionParameters = value; NotifyPropertyChanged(); }
+        }
+        public Bitmap CurrentFrame
+        {
+            get { return videoControl.Image.Bitmap; }
+        }
+
+        public int HueHSV
+        {
+            get { return _blobDetectionParameters.HueHSV; }
+            set { _blobDetectionParameters.HueHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int SaturationHSV
+        {
+            get { return _blobDetectionParameters.SaturationHSV; }
+            set { _blobDetectionParameters.SaturationHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int ValueHSV
+        {
+            get { return _blobDetectionParameters.ValueHSV; }
+            set { _blobDetectionParameters.ValueHSV = value; NotifyPropertyChanged(); }
+        }
+        public int MinBlob
+        {
+            get { return _blobDetectionParameters.BlobDetectionOptions.MinArea; }
+            set { _blobDetectionParameters.BlobDetectionOptions.MinArea = value; NotifyPropertyChanged(); }
+        }
+
+        public int DifferenceThreshold
+        {
+            get { return _blobDetectionParameters.DifferenceThreshold; }
+            set { _blobDetectionParameters.DifferenceThreshold = value; NotifyPropertyChanged(); }
         }
 
         #endregion
@@ -163,17 +195,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (openFileDialog.ShowDialog() == true)
             {
                 var path = openFileDialog.FileName;
-                BlobDetectionParameters.AverageBitmap = new Bitmap(path);
+                BlobDetectionParameters.BackgroundBitmap = new Bitmap(path);
                 IsBackgroundImageLoaded = true;
             }
         }
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var exportWindow = new ExportWindow();
-            exportWindow.Owner = Window.GetWindow(this);
+            var exportWindow = new ExportWindow(BlobDetectionParameters)
+            {
+                Owner = GetWindow(this)
+            };
 
-            exportWindow.Show();
+            exportWindow.ShowDialog();
         }
 
         private void PlayPauseButton_Click(object sender, RoutedEventArgs e)
@@ -221,6 +255,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             IsVideoPaused = true;
         }
 
+        private void VideoControl_MediaPaused()
+        {
+            IsVideoPaused = true;
+        }
+
         private void VideoControl_FrameChanged(FrameData frameData)
         {
             CurrentFrameNumber = frameData.CurrentFrame;
@@ -244,22 +283,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             videoControl.Pause();
             IsVideoPaused = true;
-
-            Task.Delay(100).ContinueWith(t =>
-            {
-                if (!BlobDetectionParameters.MarkBlobs)
-                {
-                    var reader = FrameReaderSingleton.GetInstance();
-                    var frame = reader.GetFrame(CurrentFrameNumber);
-
-                    BlobDetectionParameters.MarkBlobs = true;
-                    var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
-                    BlobDetectionParameters.MarkBlobs = false;
-                    CountedPeople = countedPeople;
-
-                    videoControl.SetFrameContent(image);
-                }
-            });
         }
 
         private void PlayVideo(bool fromBeginning = false)
@@ -267,11 +290,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             if (fromBeginning)
                 videoControl.Stop();
 
-            Task.Delay(100).ContinueWith(t =>
+            try
             {
-                videoControl.Play();
-                IsVideoPaused = false;
-            });
+                Task.Delay(100).ContinueWith(t =>
+                {
+                    videoControl.Play();
+                    IsVideoPaused = false;
+                }).Wait();
+            }
+            catch(AggregateException ex)
+            {
+                throw ex.InnerException;
+            }
         }
 
         #endregion

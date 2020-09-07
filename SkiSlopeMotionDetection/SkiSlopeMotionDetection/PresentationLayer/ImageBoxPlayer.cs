@@ -29,6 +29,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         public Action MediaOpened { get; set; }
         public Action MediaEnded { get; set; }
+        public Action MediaPaused { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
         public bool UseOriginalRefreshRate { get; set; } = false;
@@ -116,6 +117,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _frameTime = 1000 / _frameRate;
             _currentFrame = 0;
 
+            AverageFrameSingleton.GetInstance(true);
+
             DisplayFirstFrame();
             MediaOpened?.Invoke(); 
         }
@@ -129,9 +132,16 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void FrameReaderWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             IsVideoPlaying = false;
-            
-            if(!e.Cancelled)
+
+            if (e.Error != null)
+            {
+                MediaPaused?.Invoke();
+                MessageBox.Show(e.Error.Message, "Invalid argument", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            else if (!e.Cancelled)
+            {
                 MediaEnded?.Invoke();
+            }
         }
 
         private void FrameReaderWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -167,6 +177,15 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
                 else
                 {
+
+                    if (_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
+                    {
+                        if (_currentFrame % 10 == 0)
+                        {
+                            _blobDetectionParams.AddFrameToAverage = true;
+                        }
+                    }
+
                     var image = BlobDetection.GetResultImage(frame, _blobDetectionParams, out countedPeople);
 
                     SetFrameContent(image);
