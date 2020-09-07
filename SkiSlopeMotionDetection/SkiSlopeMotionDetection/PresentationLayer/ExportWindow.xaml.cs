@@ -215,6 +215,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     break;
 
                 case ExportMode.Histogram:
+                    filter =
+                        "Portable Network Graphics (*.png)|*.png|";
                     break;
 
                 default:
@@ -244,6 +246,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                         break;
 
                     case ExportMode.Histogram:
+                        ExportHistogram(saveFileDialog.FileName);
                         break;
 
                     default:
@@ -300,6 +303,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _exportWorker.RunWorkerAsync(outputFileName);
             if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
+        }
+
+        private void ExportHistogram(string outputFileName)
+        {
+
         }
 
         private (int first, int last) GetFirstAndLastFrameNumber(int frameCount)
