@@ -169,7 +169,7 @@
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <RadioButton Content="Difference with background" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithBackground}" Margin="10 10 10 5"/>
                                 <RadioButton Content="Difference with average frame"  IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithAverage}" Margin="10 5 10 5"/>
-                                <RadioButton Content="Naive method" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Naive}" IsEnabled="False" Margin="10 5 10 10"/>
+                                <RadioButton Content="Naive method" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Naive}" Margin="10 5 10 10"/>
                             </StackPanel>
                         </GroupBox>
                     </Grid>

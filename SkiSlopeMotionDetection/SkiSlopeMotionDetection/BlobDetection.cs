@@ -5,7 +5,6 @@ using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace SkiSlopeMotionDetection
 {
@@ -49,7 +48,7 @@ namespace SkiSlopeMotionDetection
             return GetDifference(im1, im2, threshold);
         }
 
-            public static Image<Bgr, byte> GetDifference(Image<Bgr, byte> im1, Image<Bgr, byte> im2, int threshold)
+        public static Image<Bgr, byte> GetDifference(Image<Bgr, byte> im1, Image<Bgr, byte> im2, int threshold)
         {
             if (im1.Height != im2.Height || im1.Width != im2.Width)
                 throw new ArgumentException("Both video and background image must have the same size");
@@ -68,6 +67,13 @@ namespace SkiSlopeMotionDetection
 
                 case DetectionMethod.DiffWithAverage:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
+
+                case DetectionMethod.Naive:
+                    detectionParams.HueHSV = 0;
+                    detectionParams.SaturationHSV = 0;
+                    detectionParams.ValueHSV = 133;
+                    detectionParams.BlobDetectionOptions.MinArea = 250;
+                    return GetImageBySimpleMethod(sourceBitmap, detectionParams, out blobsCount);
 
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
@@ -141,7 +147,8 @@ namespace SkiSlopeMotionDetection
             if (detectionParams.MarkBlobs)
             {
                 Mat imWithKeypoints = new Mat();
-                Features2DToolbox.DrawKeypoints(conv_diff, new VectorOfKeyPoint(mKeys), imWithKeypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
+                Image<Bgr, byte> im2 = new Image<Bgr, byte>(sourceBitmap);
+                Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), imWithKeypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
                 result = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
             }
             return result;
