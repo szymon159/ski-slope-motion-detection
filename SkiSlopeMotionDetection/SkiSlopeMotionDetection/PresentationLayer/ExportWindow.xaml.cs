@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -73,7 +74,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
 
-            (int first, int last) = SetFirstAndLastFrameNumber((int)reader.FrameCount);
+            (int first, int last) = GetFirstAndLastFrameNumber((int)reader.FrameCount);
+            int totalFrames = last - first;
 
             using (var writer = new VideoFileWriter())
             {
@@ -108,7 +110,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                     writer.WriteVideoFrame(frame);
 
-                    var progress = 100 * i / (double)reader.FrameCount;
+                    var progress = 100 * i / (double)totalFrames;
                     _exportWorker.ReportProgress((int)progress);
                 }
             }
@@ -119,7 +121,13 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
 
-            (int first, int last) = SetFirstAndLastFrameNumber((int)reader.FrameCount);
+            (int first, int last) = GetFirstAndLastFrameNumber((int)reader.FrameCount);
+            int framesForAverage = GetFramesForAverageCount((int)Math.Round(reader.FrameRate));
+            int totalFrames = last - first;
+
+            double peopleSum = 0;
+            int frameCount = 0;
+            int firstFrame = first;
 
             using (var writer = new StreamWriter(outputFileName))
             {
@@ -140,11 +148,26 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     }
 
                     Bitmap frame = reader.GetFrame(i);
-                    BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleCount);
+                    BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleInFrame);
 
-                    writer.WriteLine($"Frame {i}: {peopleCount} people");
+                    if (i % framesForAverage == 0 && i != 0)
+                    {
+                        writer.WriteLine($"{ExportSettings.TimeSpan} {i / framesForAverage} (frames {i - frameCount} - {i - 1}): {peopleSum / frameCount} people in average");
 
-                    var progress = 100 * i / (double)reader.FrameCount;
+                        peopleSum = 0;
+                        frameCount = 0;
+                        firstFrame = i;
+                    }
+
+                    peopleSum += peopleInFrame;
+                    frameCount++;
+
+                    if (i == last - 1)
+                    {
+                        writer.WriteLine($"{ExportSettings.TimeSpan} {i / framesForAverage + 1} (frames {i - frameCount + 1} - {i}): {peopleSum / frameCount} people in average");
+                    }
+
+                    var progress = 100 * i / (double)totalFrames;
                     _exportWorker.ReportProgress((int)progress);
                 }
             }
@@ -279,7 +302,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 _exportWorker.CancelAsync();
         }
 
-        private (int first, int last) SetFirstAndLastFrameNumber(int frameCount)
+        private (int first, int last) GetFirstAndLastFrameNumber(int frameCount)
         {
             int first = 0, last = 0;
             if (!ExportSettings.FirstFrame.HasValue)
@@ -300,6 +323,21 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     last = frameCount;
             }
             return (first, last);
+        }
+
+        private int GetFramesForAverageCount(int frameRate)
+        {
+            switch (ExportSettings.TimeSpan)
+            {
+                case TimeSpan.Second:
+                    return frameRate;
+                case TimeSpan.Minute:
+                    return 60 * frameRate;
+                case TimeSpan.Hour:
+                    return 3600 * frameRate;
+                default:
+                    return frameRate;
+            }
         }
 
         #endregion Private methods
