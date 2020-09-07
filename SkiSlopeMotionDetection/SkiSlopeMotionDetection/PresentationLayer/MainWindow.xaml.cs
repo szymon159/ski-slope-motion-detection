@@ -120,6 +120,35 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return videoControl.Image.Bitmap; }
         }
 
+        public int HueHSV
+        {
+            get { return _blobDetectionParameters.HueHSV; }
+            set { _blobDetectionParameters.HueHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int SaturationHSV
+        {
+            get { return _blobDetectionParameters.SaturationHSV; }
+            set { _blobDetectionParameters.SaturationHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int ValueHSV
+        {
+            get { return _blobDetectionParameters.ValueHSV; }
+            set { _blobDetectionParameters.ValueHSV = value; NotifyPropertyChanged(); }
+        }
+        public int MinBlob
+        {
+            get { return _blobDetectionParameters.BlobDetectionOptions.MinArea; }
+            set { _blobDetectionParameters.BlobDetectionOptions.MinArea = value; NotifyPropertyChanged(); }
+        }
+
+        public int DifferenceThreshold
+        {
+            get { return _blobDetectionParameters.DifferenceThreshold; }
+            set { _blobDetectionParameters.DifferenceThreshold = value; NotifyPropertyChanged(); }
+        }
+
         #endregion
 
         #region Event handlers
