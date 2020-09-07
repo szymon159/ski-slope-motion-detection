@@ -120,6 +120,35 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return videoControl.Image.Bitmap; }
         }
 
+        public int HueHSV
+        {
+            get { return _blobDetectionParameters.HueHSV; }
+            set { _blobDetectionParameters.HueHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int SaturationHSV
+        {
+            get { return _blobDetectionParameters.SaturationHSV; }
+            set { _blobDetectionParameters.SaturationHSV = value; NotifyPropertyChanged(); }
+        }
+
+        public int ValueHSV
+        {
+            get { return _blobDetectionParameters.ValueHSV; }
+            set { _blobDetectionParameters.ValueHSV = value; NotifyPropertyChanged(); }
+        }
+        public int MinBlob
+        {
+            get { return _blobDetectionParameters.BlobDetectionOptions.MinArea; }
+            set { _blobDetectionParameters.BlobDetectionOptions.MinArea = value; NotifyPropertyChanged(); }
+        }
+
+        public int DifferenceThreshold
+        {
+            get { return _blobDetectionParameters.DifferenceThreshold; }
+            set { _blobDetectionParameters.DifferenceThreshold = value; NotifyPropertyChanged(); }
+        }
+
         #endregion
 
         #region Event handlers
@@ -280,19 +309,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private void TestButton_Click(object sender, RoutedEventArgs e)
         {
             var reader = FrameReaderSingleton.GetInstance();
-            var source = reader.GetFrame(1400);
-            var detectionParams = new BlobDetectionParameters()
+            var heatMapWindow = new HeatmapWindow(reader.FrameWidth, reader.FrameHeight)
             {
-                DetectionMethod = DetectionMethod.DiffWithBackground,
-                AvgRangeBegin = 400,
-                AvgFramesCount = 600,
-                BlobDetectionOptions = new EmguBlobDetectionOptions(80)
+                Owner = GetWindow(this)
             };
-            var image = BlobDetection.GetResultImage(source, detectionParams, out int countedPeople);
-            CountedPeople = countedPeople;
-
-            CurrentFrameNumber = 1400;
-            videoControl.SetFrameContent(image);
+            heatMapWindow.Show();
         }
     }
 }
