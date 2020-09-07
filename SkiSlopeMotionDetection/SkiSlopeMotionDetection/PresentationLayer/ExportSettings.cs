@@ -9,6 +9,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private ExportMode _exportMode;
         private bool _includeMarking;
 
+        private TimeSpan _timeSpan;
+        private int _firstFrame;
+        private int _lastFrame;
+
         public ExportMode ExportMode
         {
             get { return _exportMode; }
@@ -27,6 +31,21 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool MarkingEnabled
         {
             get { return ExportMode == ExportMode.CurrentFrame || ExportMode == ExportMode.EntireVideo; }
+        }
+        public TimeSpan TimeSpan
+        {
+            get { return _timeSpan; }
+            set { _timeSpan = value; NotifyPropertyChanged(); }
+        }
+        public int FirstFrame
+        {
+            get { return _firstFrame; }
+            set { _firstFrame = value; NotifyPropertyChanged(); }
+        }
+        public int LastFrame
+        {
+            get { return _lastFrame; }
+            set { _lastFrame = value; NotifyPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -6,49 +6,68 @@
         xmlns:local="clr-namespace:SkiSlopeMotionDetection.PresentationLayer"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="Export" Height="450" Width="400" Background="LightGray" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Topmost="True">
+        Title="Export" Height="500" Width="400" Background="LightGray" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Topmost="True">
     <Window.Resources>
         <local:EnumBooleanConverter x:Key="enumBooleanConverter" />
     </Window.Resources>
     <Grid Margin="20" TextElement.FontSize="14">
         <Grid.RowDefinitions>
-            <RowDefinition Height="8*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
         <!-- Settings section -->
         <GroupBox Header="Settings">
             <StackPanel HorizontalAlignment="Center">
-                <RadioButton Content="Export only selected frame" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CurrentFrame}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                <RadioButton Content="Export entire video" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=EntireVideo}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                <RadioButton Content="Export statistics" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Stats}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                <RadioButton Content="Export heatmap" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Histogram}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                <Separator Margin="0 10" Width="300"/>
+                <RadioButton Content="Export only selected frame" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=CurrentFrame}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5" />
+                <RadioButton Content="Export entire video" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=EntireVideo}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5" />
+                <RadioButton Content="Export statistics" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Stats}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5" />
+                <RadioButton Content="Export heatmap" IsChecked="{Binding Path=ExportSettings.ExportMode, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Histogram}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5" />
+                <Separator Margin="0 10" Width="300" />
                 <GroupBox Header="Export duration">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="3*" />
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            <Label Content="First frame:"/>
-                            <TextBox Text="AAAAAAA" VerticalContentAlignment="Center"/>
-                            <Label Content="Last frame:"/>
-                        </StackPanel>
-                        <Label Grid.Row="1" Content="Time span:"/>
-                        <StackPanel Grid.Row="1" HorizontalAlignment="Center">
-                            <RadioButton Content="Second" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                            <RadioButton Content="Minute" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                            <RadioButton Content="Hour" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
-                        </StackPanel>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label Content="First frame:" />
+                            <TextBox Grid.Column="1" VerticalContentAlignment="Center" Text="{Binding ExportSettings.FirstFrame}" />
+                            <Label Grid.Column="2" Content="Last frame:" />
+                            <TextBox Grid.Column="3" VerticalContentAlignment="Center" Text="{Binding ExportSettings.LastFrame}" />
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="1" Content="Time span:" />
+                            <RadioButton Grid.Row="1" Grid.Column="0" Content="Second" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"
+                                         IsChecked="{Binding Path=ExportSettings.TimeSpan, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Second}" />
+                            <RadioButton Grid.Row="1" Grid.Column="1" Content="Minute" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"
+                                         IsChecked="{Binding Path=ExportSettings.TimeSpan, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Minute}" />
+                            <RadioButton Grid.Row="1" Grid.Column="2" Content="Hour" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"
+                                         IsChecked="{Binding Path=ExportSettings.TimeSpan, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Hour}" />
+                        </Grid>
                     </Grid>
                 </GroupBox>
-                <Separator Margin="0 10" Width="300"/>
-                <CheckBox Content="Include marking" IsChecked="{Binding ExportSettings.IncludeMarkingChecked}" IsEnabled="{Binding ExportSettings.MarkingEnabled}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5"/>
+                <Separator Margin="0 10" Width="300" />
+                <CheckBox Content="Include marking" IsChecked="{Binding ExportSettings.IncludeMarkingChecked}" IsEnabled="{Binding ExportSettings.MarkingEnabled}" HorizontalAlignment="Center" VerticalContentAlignment="Center" Padding="5" />
             </StackPanel>
         </GroupBox>
-        
+
         <!-- Export Button -->
-        <Button Content="Export" Grid.Row="1" Click="ExportButton_Click" Width="150" Height="40"/>
+        <Button Content="Export" Grid.Row="1" Click="ExportButton_Click" Width="150" Height="40" />
     </Grid>
 </Window>
