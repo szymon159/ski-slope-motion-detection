@@ -6,23 +6,27 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 {
     public class ExportSettings : INotifyPropertyChanged
     {
-        private bool _exportEntireVideo;
+        private ExportMode _exportMode;
         private bool _includeMarking;
 
-        public bool ExportEntireVideo
-        { 
-            get { return _exportEntireVideo; } 
-            set { _exportEntireVideo = value; NotifyPropertyChanged(); }
-        }
-        public bool ExportSelectedFrame
+        public ExportMode ExportMode
         {
-            get { return !_exportEntireVideo; }
-            set { _exportEntireVideo = !value; NotifyPropertyChanged(); }
+            get { return _exportMode; }
+            set { _exportMode = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkingEnabled"); NotifyPropertyChanged("IncludeMarkingChecked"); }
         }
         public bool IncludeMarking 
         { 
             get { return _includeMarking; } 
-            set { _includeMarking = value; NotifyPropertyChanged(); }
+            set { _includeMarking = value; NotifyPropertyChanged(); NotifyPropertyChanged("IncludeMarkingChecked"); }
+        }
+        public bool IncludeMarkingChecked
+        {
+            get { return IncludeMarking && MarkingEnabled; }
+            set { IncludeMarking = value; }
+        }
+        public bool MarkingEnabled
+        {
+            get { return ExportMode == ExportMode.CurrentFrame || ExportMode == ExportMode.EntireVideo; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -31,9 +35,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ExportSettings(bool exportEntireVideo = false, bool includeMarking = true)
+        public ExportSettings(ExportMode exportMode = ExportMode.CurrentFrame, bool includeMarking = true)
         {
-            ExportEntireVideo = exportEntireVideo;
+            ExportMode = exportMode;
             IncludeMarking = includeMarking;
         }
     }

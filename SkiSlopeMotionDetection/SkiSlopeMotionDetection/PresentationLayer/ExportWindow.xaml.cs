@@ -46,11 +46,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         #region Public methods
 
-        public ExportWindow(BlobDetectionParameters blobDetectionParameters, bool exportEntireVideo = false, bool includeMarking = true)
+        public ExportWindow(BlobDetectionParameters blobDetectionParameters, ExportMode exportMode = ExportMode.CurrentFrame, bool includeMarking = true)
         {
-            InitializeComponent();
+            ExportSettings = new ExportSettings(exportMode, includeMarking);
 
-            ExportSettings = new ExportSettings(exportEntireVideo, includeMarking);
+            InitializeComponent();
 
             _blobDetectionParameters = blobDetectionParameters;
 
@@ -135,16 +135,27 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = ExportSettings.ExportEntireVideo ? videoFilter : imageFilter,
+                Filter = ExportSettings.ExportMode == ExportMode.EntireVideo ? videoFilter : imageFilter,
                 InitialDirectory = Environment.CurrentDirectory
             };
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                if (ExportSettings.ExportSelectedFrame)
-                    ExportFrame(saveFileDialog.FileName);
-                else
-                    ExportVideo(saveFileDialog.FileName);
+                switch (ExportSettings.ExportMode)
+                {
+                    case ExportMode.CurrentFrame:
+                        ExportFrame(saveFileDialog.FileName);
+                        break;
+                    case ExportMode.EntireVideo:
+                        ExportVideo(saveFileDialog.FileName);
+                        break;
+                    case ExportMode.Stats:
+                        break;
+                    case ExportMode.Histogram:
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

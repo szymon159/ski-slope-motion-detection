@@ -113,6 +113,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PresentationLayer\ExportMode.cs" />
     <Compile Include="PresentationLayer\ExportProgressWindow.xaml.cs">
       <DependentUpon>ExportProgressWindow.xaml</DependentUpon>
     </Compile>
