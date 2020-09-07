@@ -29,6 +29,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         public Action MediaOpened { get; set; }
         public Action MediaEnded { get; set; }
+        public Action MediaPaused { get; set; }
         public Action<FrameData> FrameChanged { get; set; }
         public bool IsVideoPlaying { get; set; }
         public bool UseOriginalRefreshRate { get; set; } = false;
@@ -131,10 +132,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             IsVideoPlaying = false;
 
             if (e.Error != null)
+            {
+                MediaPaused?.Invoke();
                 MessageBox.Show(e.Error.Message, "Invalid argument", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
-            if (!e.Cancelled)
+            }
+            else if (!e.Cancelled)
+            {
                 MediaEnded?.Invoke();
+            }
         }
 
         private void FrameReaderWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -144,12 +149,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             if(_frameReader == null)
                 throw new ArgumentException("Unable to fetch next frame. Frame reader has not been set");
-
-            if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
-            {
-                _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
-                _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
-            }
 
             while (_currentFrame < _frameCount)
             {
@@ -176,13 +175,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
                 else
                 {
-                    // Update average if necessary
-                    //if(_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage 
-                    //    && ((_currentFrame % _blobDetectionParams.AvgFramesCount == 0 && _currentFrame != 0) || _blobDetectionParams.BackgroundBitmap == _blobDetectionParams.AverageBitmap))
-                    //{                        
-                    //    _blobDetectionParams.AvgRangeBegin = _currentFrame / _blobDetectionParams.AvgFramesCount;
-                    //    _blobDetectionParams.AverageBitmap = Processing.GetAverage(_blobDetectionParams.AvgFramesCount, _blobDetectionParams.AvgRangeBegin);
-                    //}
 
                     if (_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
                     {

@@ -64,7 +64,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             get { return _useOriginalRefreshRate; }
             set { _useOriginalRefreshRate = value; videoControl.UseOriginalRefreshRate = value; if (value) MarkPeopleOnEachFrame = false; NotifyPropertyChanged(); NotifyPropertyChanged("UseAdjustedRefreshRate"); }
         }
-        public bool MarkPeopleOnPausedFrame
+        public bool MarkPeopleDisabled
         {
             get { return !_blobDetectionParameters.MarkBlobs; }
             set { _blobDetectionParameters.MarkBlobs = !value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnEachFrame"); }
@@ -72,7 +72,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         public bool MarkPeopleOnEachFrame
         {
             get { return _blobDetectionParameters.MarkBlobs; }
-            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleOnPausedFrame"); }
+            set { _blobDetectionParameters.MarkBlobs = value; NotifyPropertyChanged(); NotifyPropertyChanged("MarkPeopleDisabled"); }
         }
         public Visibility LoadVideoButtonVisibility
         {
@@ -226,6 +226,11 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             IsVideoPaused = true;
         }
 
+        private void VideoControl_MediaPaused()
+        {
+            IsVideoPaused = true;
+        }
+
         private void VideoControl_FrameChanged(FrameData frameData)
         {
             CurrentFrameNumber = frameData.CurrentFrame;
@@ -249,29 +254,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             videoControl.Pause();
             IsVideoPaused = true;
-
-            try
-            {
-                Task.Delay(100).ContinueWith(t =>
-                {
-                    if (!BlobDetectionParameters.MarkBlobs)
-                    {
-                        var reader = FrameReaderSingleton.GetInstance();
-                        var frame = reader.GetFrame(CurrentFrameNumber);
-
-                        BlobDetectionParameters.MarkBlobs = true;
-                        var image = BlobDetection.GetResultImage(frame, BlobDetectionParameters, out int countedPeople);
-                        BlobDetectionParameters.MarkBlobs = false;
-                        CountedPeople = countedPeople;
-
-                        videoControl.SetFrameContent(image);
-                    }
-                }).Wait();
-            }
-            catch (AggregateException ex)
-            {
-                throw ex.InnerException;
-            }
         }
 
         private void PlayVideo(bool fromBeginning = false)

@@ -64,8 +64,7 @@ namespace SkiSlopeMotionDetection
             switch (detectionParams.DetectionMethod)
             {
                 case DetectionMethod.DiffWithBackground:
-                    detectionParams.AverageBitmap = detectionParams.BackgroundBitmap;
-                    return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
+                    return GetImageByDiffWithBackground(sourceBitmap, detectionParams, out blobsCount);
 
                 case DetectionMethod.DiffWithAverage:
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
@@ -73,6 +72,13 @@ namespace SkiSlopeMotionDetection
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
             }
+        }
+
+        private static Bitmap GetImageByDiffWithBackground(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        {
+            detectionParams.AverageBitmap = detectionParams.BackgroundBitmap;
+
+            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount);
         }
 
         private static Bitmap GetImageByDiffWithAverage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
@@ -85,6 +91,11 @@ namespace SkiSlopeMotionDetection
             }
             detectionParams.AverageBitmap = avgCounter.GetAverageBitmap();
 
+            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount);
+        }
+
+        private static Bitmap GetImageByDiff(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        {
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
 
