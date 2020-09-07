@@ -162,7 +162,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     peopleSum += peopleInFrame;
                     frameCount++;
 
-                    if (i == last - 1)
+                    if (i == last - 1 && (i % framesForAverage != 0 || i == 0))
                     {
                         writer.WriteLine($"{ExportSettings.TimeSpan} {i / framesForAverage + 1} (frames {i - frameCount + 1} - {i}): {peopleSum / frameCount} people in average");
                     }
