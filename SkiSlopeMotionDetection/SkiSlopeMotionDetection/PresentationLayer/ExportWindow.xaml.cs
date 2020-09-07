@@ -22,27 +22,28 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private ExportProgressWindow _exportProgressWindow;
         private BlobDetectionParameters _blobDetectionParameters;
 
-        #endregion
+        #endregion Private variables
 
         #region Properties
 
-        public ExportSettings ExportSettings 
-        { 
+        public ExportSettings ExportSettings
+        {
             get { return _settings; }
             set { _settings = value; NotifyPropertyChanged(); }
         }
 
-        #endregion
+        #endregion Properties
 
         #region Event handlers
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
+        #endregion Event handlers
 
         #region Public methods
 
@@ -63,7 +64,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _exportWorker.ProgressChanged += ExportWorker_ProgressChanged;
         }
 
-        #endregion
+        #endregion Public methods
 
         #region Private methods
 
@@ -71,21 +72,40 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
+            int first = 0, last = 0;
+
+            if (!ExportSettings.FirstFrame.HasValue)
+                first = 0;
+            if (!ExportSettings.LastFrame.HasValue)
+                last = (int)reader.FrameCount;
+            if (ExportSettings.FirstFrame.HasValue && ExportSettings.LastFrame.HasValue)
+            {
+                first = ExportSettings.FirstFrame.Value;
+                if (first < 0)
+                    first = 0;
+                if (first >= reader.FrameCount)
+                    first = (int)reader.FrameCount - 1;
+                last = ExportSettings.LastFrame.Value;
+                if (last < 0)
+                    last = 0;
+                if (last > reader.FrameCount)
+                    last = (int)reader.FrameCount;
+            }
 
             using (var writer = new VideoFileWriter())
             {
                 writer.Open(outputFileName, reader.FrameWidth, reader.FrameHeight, new Rational(reader.FrameRate), VideoCodec.Default);
                 if (!writer.IsOpen)
                     throw new ArgumentException("Unable to open file for writing");
-               
-                for (int i = 0; i < reader.FrameCount; i++)
+
+                for (int i = first; i < last; i++)
                 {
                     if (_exportWorker.CancellationPending)
                         break;
 
                     Bitmap frame = reader.GetFrame(i);
 
-                    if(ExportSettings.IncludeMarking)
+                    if (ExportSettings.IncludeMarking)
                     {
                         // Hack to prevent from deep copy of _blobDetectionParameters
                         var temp = _blobDetectionParameters.MarkBlobs;
@@ -150,7 +170,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             switch (ExportSettings.ExportMode)
             {
                 case ExportMode.CurrentFrame:
-                    filter = 
+                    filter =
                         "Bitmap (*.bmp)|*.bmp|" +
                         "Graphics Interchange Format (*.gif)|*.gif|" +
                         "Exchangeable Image File Format (*.exif)|*.exif|" +
@@ -158,21 +178,24 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                         "Portable Network Graphics (*.png)|*.png|" +
                         "Tagged Image File Format (*.tiff)|*.tiff";
                     break;
+
                 case ExportMode.EntireVideo:
-                    filter = 
+                    filter =
                         "MP4 video file (*.mp4)|*.mp4|" +
                         "Audio Video Interleave (*.avi)|*.avi";
                     break;
+
                 case ExportMode.Stats:
                     filter =
                         "Text file (*.txt)|*.txt";
                     break;
+
                 case ExportMode.Histogram:
                     break;
+
                 default:
                     break;
             }
-
 
             var saveFileDialog = new SaveFileDialog
             {
@@ -187,14 +210,18 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     case ExportMode.CurrentFrame:
                         ExportFrame(saveFileDialog.FileName);
                         break;
+
                     case ExportMode.EntireVideo:
                         ExportVideo(saveFileDialog.FileName);
                         break;
+
                     case ExportMode.Stats:
                         ExportStats(saveFileDialog.FileName);
                         break;
+
                     case ExportMode.Histogram:
                         break;
+
                     default:
                         break;
                 }
@@ -233,7 +260,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             _exportWorker.DoWork += ExportWorker_DoWorkVideo;
             _exportWorker.RunWorkerAsync(outputFileName);
-            if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+            if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
         }
 
@@ -250,6 +277,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 _exportWorker.CancelAsync();
         }
 
-        #endregion
+        #endregion Private methods
     }
 }
