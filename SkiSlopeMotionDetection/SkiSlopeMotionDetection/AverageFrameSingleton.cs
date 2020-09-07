@@ -8,38 +8,30 @@ using System.Threading.Tasks;
 
 namespace SkiSlopeMotionDetection
 {
-    public class AverageFrame
+    public class AverageFrameSingleton
     {
-        private int DesiredSize = 80;
-
-        private LinkedList<Bitmap> bitmaps = new LinkedList<Bitmap>();
-
-        private (long, long, long)[,] mean;
-
-        private int frameWidth;
-
-        private int frameHeight;
-
-        private bool hasChanged = true;
-
-        private Bitmap lastAverage = null;
-
-        public AverageFrame(int frameWidth, int frameHeight)
+        private static AverageFrameSingleton _instance = null;
+        private static readonly object _padlock = new object();
+        public static AverageFrameSingleton GetInstance()
         {
-            this.frameWidth = frameWidth;
-            this.frameHeight = frameHeight;
-            mean = new (long, long, long)[frameWidth, frameHeight];
-            for (int i = 0; i < frameWidth; i++)
+            lock (_padlock)
             {
-                for (int j = 0; j < frameHeight; j++)
-                {
-                    mean[i, j] = (0, 0, 0);
-                }
+                if (_instance == null)
+                    _instance = new AverageFrameSingleton();
+
+                return _instance;
             }
+        }
+
+        public static void InitializeNewInstance()
+        {
+            _instance = new AverageFrameSingleton();
         }
 
         public Bitmap GetAverageBitmap()
         {
+            if (bitmaps.Count == 0)
+                return new Bitmap(frameWidth, frameHeight);
             if (hasChanged)
             {
                 Bitmap returnBitmap = new Bitmap(frameWidth, frameHeight);
@@ -84,7 +76,36 @@ namespace SkiSlopeMotionDetection
             }
 
             bitmaps.AddLast(bitmap);
-            AddFrameToMean(bitmap);           
+            AddFrameToMean(bitmap);
+        }
+
+        private int DesiredSize = 80;
+
+        private LinkedList<Bitmap> bitmaps = new LinkedList<Bitmap>();
+
+        private (long, long, long)[,] mean;
+
+        private int frameWidth;
+
+        private int frameHeight;
+
+        private bool hasChanged = true;
+
+        private Bitmap lastAverage = null;
+
+        private AverageFrameSingleton()
+        {
+            var reader = FrameReaderSingleton.GetInstance();
+            this.frameWidth = reader.FrameWidth;
+            this.frameHeight = reader.FrameHeight;
+            mean = new (long, long, long)[frameWidth, frameHeight];
+            for (int i = 0; i < frameWidth; i++)
+            {
+                for (int j = 0; j < frameHeight; j++)
+                {
+                    mean[i, j] = (0, 0, 0);
+                }
+            }
         }
 
         private void DeleteFrameFromMean(Bitmap bitmap)

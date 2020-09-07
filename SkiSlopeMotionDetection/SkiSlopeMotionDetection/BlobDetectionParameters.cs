@@ -8,6 +8,7 @@ namespace SkiSlopeMotionDetection
         public int AvgRangeBegin { get; set; } = 0;
         public int AvgFramesCount { get; set; } = 100;
         public bool MarkBlobs { get; set; } = true;
+        public bool AddFrameToAverage { get; set; } = false;
         public int DifferenceThreshold { get; set; } = 30;
 
 
