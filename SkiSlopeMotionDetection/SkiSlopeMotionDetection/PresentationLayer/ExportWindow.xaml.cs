@@ -107,6 +107,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                     if (ExportSettings.IncludeMarking)
                     {
+                        if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                        {
+                            if (i % 10 == 0)
+                            {
+                                _blobDetectionParameters.AddFrameToAverage = true;
+                            }
+                        }
+
                         // Hack to prevent from deep copy of _blobDetectionParameters
                         var temp = _blobDetectionParameters.MarkBlobs;
 
@@ -137,6 +145,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 {
                     if (_exportWorker.CancellationPending)
                         break;
+
+                    if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                    {
+                        if (i % 10 == 0)
+                        {
+                            _blobDetectionParameters.AddFrameToAverage = true;
+                        }
+                    }
 
                     Bitmap frame = reader.GetFrame(i);
                     BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleCount);
@@ -234,16 +250,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 throw new ApplicationException("Unable to get current frame");
 
             var extension = Path.GetExtension(outputFileName);
-            Bitmap currentFrame;
+            var reader = FrameReaderSingleton.GetInstance();
+            var currentFrame = reader.GetFrame(mainWindow.CurrentFrameNumber);
 
-            if (!ExportSettings.IncludeMarking)
+            if (ExportSettings.IncludeMarking)
             {
-                var reader = FrameReaderSingleton.GetInstance();
-                currentFrame = reader.GetFrame(mainWindow.CurrentFrameNumber);
-            }
-            else
-            {
-                currentFrame = mainWindow.CurrentFrame;
+                // Hack to prevent from deep copy of _blobDetectionParameters
+                var temp = _blobDetectionParameters.MarkBlobs;
+
+                _blobDetectionParameters.MarkBlobs = true;
+                currentFrame = BlobDetection.GetResultImage(currentFrame, _blobDetectionParameters, out _);
+                _blobDetectionParameters.MarkBlobs = temp;
             }
 
             currentFrame.Save(outputFileName, extension.ToImageFormat());
