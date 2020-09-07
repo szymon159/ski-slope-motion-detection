@@ -117,6 +117,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _frameTime = 1000 / _frameRate;
             _currentFrame = 0;
 
+            AverageFrameSingleton.GetInstance(true);
+
             DisplayFirstFrame();
             MediaOpened?.Invoke(); 
         }
