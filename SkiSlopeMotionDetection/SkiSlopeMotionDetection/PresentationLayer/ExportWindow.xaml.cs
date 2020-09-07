@@ -72,25 +72,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         {
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
-            int first = 0, last = 0;
 
-            if (!ExportSettings.FirstFrame.HasValue)
-                first = 0;
-            if (!ExportSettings.LastFrame.HasValue)
-                last = (int)reader.FrameCount;
-            if (ExportSettings.FirstFrame.HasValue && ExportSettings.LastFrame.HasValue)
-            {
-                first = ExportSettings.FirstFrame.Value;
-                if (first < 0)
-                    first = 0;
-                if (first >= reader.FrameCount)
-                    first = (int)reader.FrameCount - 1;
-                last = ExportSettings.LastFrame.Value;
-                if (last < 0)
-                    last = 0;
-                if (last > reader.FrameCount)
-                    last = (int)reader.FrameCount;
-            }
+            (int first, int last) = SetFirstAndLastFrameNumber((int)reader.FrameCount);
 
             using (var writer = new VideoFileWriter())
             {
@@ -136,12 +119,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
 
+            (int first, int last) = SetFirstAndLastFrameNumber((int)reader.FrameCount);
+
             using (var writer = new StreamWriter(outputFileName))
             {
                 if (writer == null)
                     throw new ArgumentException("Unable to open file for writing");
 
-                for (int i = 0; i < reader.FrameCount; i++)
+                for (int i = first; i < last; i++)
                 {
                     if (_exportWorker.CancellationPending)
                         break;
@@ -292,6 +277,29 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             _exportWorker.RunWorkerAsync(outputFileName);
             if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
+        }
+
+        private (int first, int last) SetFirstAndLastFrameNumber(int frameCount)
+        {
+            int first = 0, last = 0;
+            if (!ExportSettings.FirstFrame.HasValue)
+                first = 0;
+            if (!ExportSettings.LastFrame.HasValue)
+                last = frameCount;
+            if (ExportSettings.FirstFrame.HasValue && ExportSettings.LastFrame.HasValue)
+            {
+                first = ExportSettings.FirstFrame.Value;
+                if (first < 0)
+                    first = 0;
+                if (first >= frameCount)
+                    first = frameCount - 1;
+                last = ExportSettings.LastFrame.Value;
+                if (last < 0)
+                    last = 0;
+                if (last > frameCount)
+                    last = frameCount;
+            }
+            return (first, last);
         }
 
         #endregion Private methods
