@@ -87,6 +87,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                     if(ExportSettings.IncludeMarking)
                     {
+                        if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                        {
+                            if (i % 10 == 0)
+                            {
+                                _blobDetectionParameters.AddFrameToAverage = true;
+                            }
+                        }
+
                         // Hack to prevent from deep copy of _blobDetectionParameters
                         var temp = _blobDetectionParameters.MarkBlobs;
 
@@ -117,6 +125,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 {
                     if (_exportWorker.CancellationPending)
                         break;
+
+                    if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                    {
+                        if (i % 10 == 0)
+                        {
+                            _blobDetectionParameters.AddFrameToAverage = true;
+                        }
+                    }
 
                     Bitmap frame = reader.GetFrame(i);
                     BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleCount);
