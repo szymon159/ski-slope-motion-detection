@@ -100,5 +100,33 @@ namespace SkiSlopeMotionDetection
 
             return result;
         }
+
+        private static Bitmap GetImageBySimpleMethod(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        {
+            if (detectionParams.BlobDetectionOptions == null)
+                throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
+
+            if (!detectionParams.HueHSV.HasValue || !detectionParams.SaturationHSV.HasValue || !detectionParams.ValueHSV.HasValue)
+            {
+                throw new ArgumentException("Unable to get difference, HSV threshold must be specified");
+            }
+
+            var conv_image = new Image<Bgr, byte>(sourceBitmap);
+            var hsv_img = conv_image.Convert<Hsv, byte>();
+            var diff = hsv_img.ThresholdBinaryInv(new Hsv(detectionParams.HueHSV.Value, detectionParams.SaturationHSV.Value, detectionParams.ValueHSV.Value), new Hsv(0, 0, 255));
+
+            var conv_diff = diff.Convert<Bgr, byte>();
+            MKeyPoint[] mKeys = ReturnBlobs(conv_diff, detectionParams.BlobDetectionOptions);
+            blobsCount = mKeys.Length;
+
+            Bitmap result = sourceBitmap;
+            if (detectionParams.MarkBlobs)
+            {
+                Mat imWithKeypoints = new Mat();
+                Features2DToolbox.DrawKeypoints(conv_diff, new VectorOfKeyPoint(mKeys), imWithKeypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
+                result = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
+            }
+            return result;
+        }
     }
 }
