@@ -60,30 +60,35 @@ namespace SkiSlopeMotionDetection
 
         public static Bitmap GetResultImage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
         {
+            return GetResultImage(sourceBitmap, detectionParams, out blobsCount, out _);
+        }
+
+        public static Bitmap GetResultImage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount, out MKeyPoint[] keyPoints)
+        {
             switch (detectionParams.DetectionMethod)
             {
                 case DetectionMethod.DiffWithBackground:
-                    return GetImageByDiffWithBackground(sourceBitmap, detectionParams, out blobsCount);
+                    return GetImageByDiffWithBackground(sourceBitmap, detectionParams, out blobsCount, out keyPoints);
 
                 case DetectionMethod.DiffWithAverage:
-                    return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
+                    return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount, out keyPoints);
 
                 case DetectionMethod.Naive:
-                    return GetImageBySimpleMethod(sourceBitmap, detectionParams, out blobsCount);
+                    return GetImageBySimpleMethod(sourceBitmap, detectionParams, out blobsCount, out keyPoints);
 
                 default:
                     throw new ArgumentException($"No method has been implemented for {detectionParams.DetectionMethod}");
             }
         }
 
-        private static Bitmap GetImageByDiffWithBackground(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        private static Bitmap GetImageByDiffWithBackground(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount, out MKeyPoint[] keyPoints)
         {
             detectionParams.AverageBitmap = detectionParams.BackgroundBitmap;
 
-            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount);
+            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount, out keyPoints);
         }
 
-        private static Bitmap GetImageByDiffWithAverage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        private static Bitmap GetImageByDiffWithAverage(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount, out MKeyPoint[] keyPoints)
         {
             var avgCounter = AverageFrameSingleton.GetInstance();
             if (detectionParams.AddFrameToAverage)
@@ -93,10 +98,10 @@ namespace SkiSlopeMotionDetection
             }
             detectionParams.AverageBitmap = avgCounter.GetAverageBitmap();
 
-            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount);
+            return GetImageByDiff(sourceBitmap, detectionParams, out blobsCount, out keyPoints);
         }
 
-        private static Bitmap GetImageByDiff(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        private static Bitmap GetImageByDiff(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount, out MKeyPoint[] keyPoints)
         {
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
@@ -118,10 +123,11 @@ namespace SkiSlopeMotionDetection
                 result = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
             }
 
+            keyPoints = detectionParams.GetKeyPoints ? mKeys : null;
             return result;
         }
 
-        private static Bitmap GetImageBySimpleMethod(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount)
+        private static Bitmap GetImageBySimpleMethod(Bitmap sourceBitmap, BlobDetectionParameters detectionParams, out int blobsCount, out MKeyPoint[] keyPoints)
         {
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
@@ -142,6 +148,8 @@ namespace SkiSlopeMotionDetection
                 Features2DToolbox.DrawKeypoints(im2, new VectorOfKeyPoint(mKeys), imWithKeypoints, new Bgr(0, 0, 255), Features2DToolbox.KeypointDrawType.DrawRichKeypoints);
                 result = (imWithKeypoints.ToImage<Bgr, byte>()).ToBitmap();
             }
+
+            keyPoints = detectionParams.GetKeyPoints ? mKeys : null;
             return result;
         }
     }

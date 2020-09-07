@@ -10,6 +10,7 @@ namespace SkiSlopeMotionDetection
         public bool MarkBlobs { get; set; } = true;
         public bool AddFrameToAverage { get; set; } = false;
         public int DifferenceThreshold { get; set; } = 30;
+        public bool GetKeyPoints { get; set; } = false;
 
         public int HueHSV { get; set; } = 0;
         public int SaturationHSV { get; set; } = 0;
