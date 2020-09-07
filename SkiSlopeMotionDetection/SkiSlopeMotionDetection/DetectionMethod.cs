@@ -2,6 +2,8 @@
 {
     public enum DetectionMethod
     {
-        DiffWithAverage
+        DiffWithBackground,
+        DiffWithAverage,
+        Naive
     }
 }

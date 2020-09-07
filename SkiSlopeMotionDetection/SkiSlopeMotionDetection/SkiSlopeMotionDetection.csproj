@@ -102,6 +102,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="AverageFrameSingleton.cs" />
     <Compile Include="BlobDetection.cs" />
     <Compile Include="BlobDetectionParameters.cs" />
     <Compile Include="EmguBlobDetectionOptions.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="PresentationLayer\ExportProgressWindow.xaml.cs">
       <DependentUpon>ExportProgressWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PresentationLayer\EnumBooleanConverter.cs" />
     <Compile Include="PresentationLayer\ExportSettings.cs" />
     <Compile Include="PresentationLayer\ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
