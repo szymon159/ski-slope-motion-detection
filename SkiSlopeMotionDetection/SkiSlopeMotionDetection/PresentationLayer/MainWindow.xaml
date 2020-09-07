@@ -155,6 +155,10 @@
                 <!-- Settings section -->
                 <GroupBox Header="Settings" Grid.Row="2" Margin="5 5 5 10">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*"/>
                             <RowDefinition Height="*"/>
@@ -165,13 +169,33 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <GroupBox Header="Method" Grid.Row="0" Margin="5 5 5 10">
+                        <GroupBox Header="Method" Grid.Row="0" Grid.ColumnSpan="2" Margin="5 5 5 10">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <RadioButton Content="Difference with background" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithBackground}" Margin="10 10 10 5"/>
                                 <RadioButton Content="Difference with average frame"  IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=DiffWithAverage}" Margin="10 5 10 5"/>
                                 <RadioButton Content="Naive method" IsChecked="{Binding Path=BlobDetectionParameters.DetectionMethod, Converter={StaticResource enumBooleanConverter}, ConverterParameter=Naive}" Margin="10 5 10 10"/>
                             </StackPanel>
                         </GroupBox>
+                        <TextBlock Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding Path=Value, ElementName=HueSlider, StringFormat=Hue: {0}}" />
+                        <Slider Grid.Row="1" Grid.Column="1"
+                                    x:Name="HueSlider" Minimum="0" Maximum="180" SmallChange="1" LargeChange="5" TickFrequency="10"
+                                    Value="{Binding HueHSV}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0"
+                                       Text="{Binding Path=Value, ElementName=StaturationSlider, StringFormat=Satur: {0}}" />
+                        <Slider Grid.Row="2" Grid.Column="1"
+                                    x:Name="StaturationSlider" Minimum="0" Maximum="255" SmallChange="1" LargeChange="5" TickFrequency="10"
+                                    Value="{Binding SaturationHSV}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0"
+                                       Text="{Binding Path=Value, ElementName=ValueSlider, StringFormat=Value: {0}}" />
+                        <Slider Grid.Row="3" Grid.Column="1"
+                                    x:Name="ValueSlider" Minimum="0" Maximum="255" SmallChange="1" LargeChange="5" TickFrequency="10"
+                                    Value="{Binding ValueHSV}"/>
+                        <TextBlock Grid.Row="4" Grid.Column="0"
+                                       Text="{Binding Path=Value, ElementName=MinBlobSlider, StringFormat=MinB: {0}}" />
+                        <Slider Grid.Row="4" Grid.Column="1"
+                                    x:Name="MinBlobSlider" Minimum="0" Maximum="1000" SmallChange="1" LargeChange="5" TickFrequency="10"
+                                    Value="{Binding MinBlob, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                 </GroupBox>
                 <Button Content="Test" Click="TestButton_Click"  HorizontalAlignment="Left" Height="25" Margin="10,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50"/>

@@ -69,10 +69,6 @@ namespace SkiSlopeMotionDetection
                     return GetImageByDiffWithAverage(sourceBitmap, detectionParams, out blobsCount);
 
                 case DetectionMethod.Naive:
-                    detectionParams.HueHSV = 0;
-                    detectionParams.SaturationHSV = 0;
-                    detectionParams.ValueHSV = 133;
-                    detectionParams.BlobDetectionOptions.MinArea = 250;
                     return GetImageBySimpleMethod(sourceBitmap, detectionParams, out blobsCount);
 
                 default:
@@ -130,14 +126,9 @@ namespace SkiSlopeMotionDetection
             if (detectionParams.BlobDetectionOptions == null)
                 throw new ArgumentException("Unable to get blobs, blob detection options must be specified");
 
-            if (!detectionParams.HueHSV.HasValue || !detectionParams.SaturationHSV.HasValue || !detectionParams.ValueHSV.HasValue)
-            {
-                throw new ArgumentException("Unable to get difference, HSV threshold must be specified");
-            }
-
             var conv_image = new Image<Bgr, byte>(sourceBitmap);
             var hsv_img = conv_image.Convert<Hsv, byte>();
-            var diff = hsv_img.ThresholdBinaryInv(new Hsv(detectionParams.HueHSV.Value, detectionParams.SaturationHSV.Value, detectionParams.ValueHSV.Value), new Hsv(0, 0, 255));
+            var diff = hsv_img.ThresholdBinaryInv(new Hsv(detectionParams.HueHSV, detectionParams.SaturationHSV, detectionParams.ValueHSV), new Hsv(0, 0, 255));
 
             var conv_diff = diff.Convert<Bgr, byte>();
             MKeyPoint[] mKeys = ReturnBlobs(conv_diff, detectionParams.BlobDetectionOptions);
