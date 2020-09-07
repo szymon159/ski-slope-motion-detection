@@ -283,7 +283,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             {
                 Owner = GetWindow(this)
             };
-
             heatMapWindow.Show();
         }
     }

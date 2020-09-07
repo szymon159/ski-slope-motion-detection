@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -15,6 +16,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.IO;
+using OxyPlot;
+using OxyPlot.Annotations;
+using OxyPlot.Axes;
+using OxyPlot.Series;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -23,28 +29,39 @@ namespace SkiSlopeMotionDetection.PresentationLayer
     /// </summary>
     public partial class HeatmapWindow : Window
     {
-        public Heatmap Heatmap { get; set; }
+        public Heatmap HeatMap { get; set; }
 
         public HeatmapWindow(int width, int height)
         {
-            Heatmap = new Heatmap(width, height);
+            int framesToAvg=50;
+            HeatMap = new Heatmap(width, height);
             FrameReaderSingleton reader = FrameReaderSingleton.GetInstance();
             Bitmap bm, bm2, bm3;
-            int count = (int)(reader.FrameCount / 50);
-            for (int i=0; i<count; i++)
+            int count = (int)(reader.FrameCount / framesToAvg);
+            for (int i=0; i< framesToAvg; i++)
             {
-                bm = Processing.GetAverage(50, 50*i);
+                bm = Processing.GetAverage(framesToAvg, framesToAvg * i + framesToAvg/2);
+                bm2 = reader.GetFrame(framesToAvg * i);
+                bm3 = (BlobDetection.GetDifference(bm, bm2, 60)).ToBitmap();
 
-                //for (int j = 0; j < 50; j++)
-                //{
-                bm2 = reader.GetFrame(50*i);
-                bm3 = (BlobDetection.GetDifference(bm, bm2, 30)).ToBitmap();
-
-                EmguBlobDetectionOptions opts = new EmguBlobDetectionOptions(80);
+                EmguBlobDetectionOptions opts = new EmguBlobDetectionOptions(100);
                 Emgu.CV.Structure.MKeyPoint[] mKeys = BlobDetection.ReturnBlobs(bm3, opts);
-                Heatmap.UpdateSeries(mKeys);
-                //}
+                HeatMap.UpdateSeries(mKeys);
+ 
             }
+            ImageConverter converter = new ImageConverter();
+            HeatMap.HeatMap.Annotations.Add(new OxyPlot.Annotations.ImageAnnotation
+            { 
+                ImageSource = new OxyPlot.OxyImage((byte[])converter.ConvertTo(reader.GetFrame(1), typeof(byte[]))),
+                Opacity = 0.2,
+                X = new PlotLength(0.5, PlotLengthUnit.RelativeToPlotArea),
+                Y = new PlotLength(0.5, PlotLengthUnit.RelativeToPlotArea),
+                Width = new PlotLength(1, PlotLengthUnit.RelativeToPlotArea),
+                Height = new PlotLength(1, PlotLengthUnit.RelativeToPlotArea)
+            });;
+            HeatMap.HeatMap.InvalidatePlot(true);
+
+            HeatMap.saveToFile("heatmap.png");
             InitializeComponent();
         }
     }

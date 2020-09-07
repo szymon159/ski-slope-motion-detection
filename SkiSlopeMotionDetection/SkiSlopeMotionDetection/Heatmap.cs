@@ -9,6 +9,8 @@ using OxyPlot.Axes;
 using Emgu.CV.Structure;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using OxyPlot.Wpf;
+using HeatMapSeries = OxyPlot.Series.HeatMapSeries;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -27,9 +29,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             set { heatMap.Title = value; }
         }
 
-        private HeatMapSeries series;
+        private OxyPlot.Series.HeatMapSeries series;
 
-        public HeatMapSeries Series
+        public OxyPlot.Series.HeatMapSeries Series
         {
             get { return series; }
             set { series = value; NotifyPropertyChanged(); }
@@ -45,7 +47,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 IsLegendVisible = false,
             };
 
-            Series = new HeatMapSeries
+            Series = new OxyPlot.Series.HeatMapSeries
             {
                 Title = "HMSeries",
                 Interpolate = true,
@@ -58,7 +60,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             Series.Data = new double[width, height];
             heatMap.Series.Add(Series);
 
-            heatMap.Axes.Add(new LinearColorAxis
+            heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            {
+                Position = AxisPosition.Left,
+                IsAxisVisible = false
+            });
+            heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            {
+                Position = AxisPosition.Bottom,
+                IsAxisVisible = false
+            });
+            heatMap.Axes.Add(new OxyPlot.Axes.LinearColorAxis
             {
                 Position = AxisPosition.Right,
                 IsAxisVisible = false,
@@ -68,9 +80,10 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         public void UpdateSeries(MKeyPoint[] keyPoints)
         {
-            int blobrange = 5;
+            int blobrange;
             for(int i=0; i<keyPoints.Count(); i++)
             {
+                blobrange = (int)keyPoints[i].Size / 2;
                 for(int j=0; j<blobrange+1; j++)
                 {
                     for (int k = 0; k < blobrange+1; k++)
@@ -95,6 +108,12 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 }
             }
             heatMap.InvalidatePlot(true);
+        }
+
+        public void saveToFile (string path)
+        {
+            var pngExporter = new PngExporter { Width = 1200, Height = 800, Background = OxyColors.White };
+            pngExporter.ExportToFile(HeatMap, path);
         }
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")

@@ -7,9 +7,9 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         mc:Ignorable="d"
          DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
-        Title="Areas used by skiers" Height="450" Width="800" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" Topmost="True">
+        Title="Areas used by skiers" Height="800" Width="1200" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner" Topmost="True">
     <Grid>
-        <oxy:PlotView Model="{Binding Heatmap.HeatMap}" 
+        <oxy:PlotView Model="{Binding HeatMap.HeatMap}" 
                       IsEnabled="True"
                       Background="LightGray"/>
     </Grid>
