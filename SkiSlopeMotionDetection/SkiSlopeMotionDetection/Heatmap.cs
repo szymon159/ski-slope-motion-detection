@@ -1,43 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OxyPlot;
-using OxyPlot.Series;
 using OxyPlot.Axes;
 using Emgu.CV.Structure;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using OxyPlot.Wpf;
 using HeatMapSeries = OxyPlot.Series.HeatMapSeries;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
-    public class Heatmap : INotifyPropertyChanged
+    public class Heatmap
     {
-        private PlotModel _heatMap;
-        private HeatMapSeries _series;
-
-        public PlotModel HeatMap
-        {
-            get { return _heatMap; }
-            set { _heatMap = value; NotifyPropertyChanged(); }
-        }
-        public string Title
-        {
-            get { return _heatMap.Title; }
-            set { _heatMap.Title = value; }
-        }
-        public HeatMapSeries Series
-        {
-            get { return _series; }
-            set { _series = value; NotifyPropertyChanged(); }
-        }
+        public PlotModel HeatMap { get; set; }
+        public HeatMapSeries Series { get; set; }
 
         public Heatmap(int width, int height)
         {
-            _heatMap = new PlotModel
+            HeatMap = new PlotModel
             {
                 Title = "Areas used by skiers",
                 PlotType = PlotType.XY,
@@ -56,19 +34,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             };
 
             Series.Data = new double[width, height];
-            _heatMap.Series.Add(Series);
+            HeatMap.Series.Add(Series);
 
-            _heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
             {
                 Position = AxisPosition.Left,
                 IsAxisVisible = false
             });
-            _heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
             {
                 Position = AxisPosition.Bottom,
                 IsAxisVisible = false
             });
-            _heatMap.Axes.Add(new OxyPlot.Axes.LinearColorAxis
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearColorAxis
             {
                 Position = AxisPosition.Right,
                 IsAxisVisible = false,
@@ -109,7 +87,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     }
                 }
             }
-            _heatMap.InvalidatePlot(true);
+            HeatMap.InvalidatePlot(true);
         }
 
         public void SaveToFile(string path)
@@ -117,12 +95,5 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             var pngExporter = new PngExporter { Width = 1200, Height = 800, Background = OxyColors.White };
             pngExporter.ExportToFile(HeatMap, path);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
     }
 }
