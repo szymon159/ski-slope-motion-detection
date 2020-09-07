@@ -306,14 +306,5 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         #endregion
 
-        private void TestButton_Click(object sender, RoutedEventArgs e)
-        {
-            //var reader = FrameReaderSingleton.GetInstance();
-            //var heatMapWindow = new HeatmapWindow(reader.FrameWidth, reader.FrameHeight)
-            //{
-            //    Owner = GetWindow(this)
-            //};
-            //heatMapWindow.Show();
-        }
     }
 }
