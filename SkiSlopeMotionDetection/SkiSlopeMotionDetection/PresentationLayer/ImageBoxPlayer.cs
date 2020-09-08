@@ -180,7 +180,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                     if (_blobDetectionParams.DetectionMethod == DetectionMethod.DiffWithAverage)
                     {
-                        if (_currentFrame % 10 == 0)
+                        if (_currentFrame % Globals.AverageFrequency == 0)
                         {
                             _blobDetectionParams.AddFrameToAverage = true;
                         }
