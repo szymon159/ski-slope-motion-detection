@@ -15,8 +15,8 @@
   \maketitle
 
 \section{Wstęp}
-Projekt zrealizowany w formie aplikacji desktopowej stworzonej z wykorzystaniem technologii \textit{.NET Framework}. Warstwa graficzna zaimplementowana z użyciem \textit{WPF}.\\
-Przedstawiona aplikacja wczytuje pliki do analizy i przetworzenia oraz zapewniać podstawowe możliwości regulacji niektórych parametrów wywołań w celu lepszego dostosowania otrzymanego wyniku do potrzeb użytkownika.
+Projekt zrealizowany został w formie aplikacji desktopowej stworzonej z wykorzystaniem technologii \textit{.NET Framework}. Warstwa graficzna zaimplementowana z użyciem \textit{WPF}.\\
+Przedstawiona aplikacja wczytuje pliki do analizy i przetworzenia oraz zapewnia podstawowe możliwości regulacji niektórych parametrów wywołań w celu lepszego dostosowania otrzymanego wyniku do potrzeb użytkownika.
 
 \subsection{Cel}
 Celem projektu było stworzenie aplikacji umożliwiającej narciarzom oraz osobom administrującym stokami narciarskimi analizę zapełnienia stoku, wraz z wyznaczaniem wyjątkowo eksploatowanych obszarów za pomocą nagrania.\\
@@ -25,7 +25,7 @@ Projekt miał również cel badawczy: w jego ramach chcieliśmy sprawdzić czy d
 
 \subsection{Założenia}
 W związku z panującą na świecie epidemią, dostęp do transmisji ze stoków jest niestety ograniczony, dlatego też w większości testów posłużyliśmy się archiwalnymi nagraniami z serwisu YouTube. Jako podstawowy materiał do testów zostało wybrane nagranie ze stoku Snoqualmie w USA dostępne w serwisie YouTube pod adresem (\url{https://youtube.com/watch?v=GNV9a4Ilsq8}).\\ 
-Dominująca część analizy oparła się na ujęciach zaczynające się około 42. minuty tego nagrania (przykładowe klatki poniżej), założyliśmy więc:
+Dominująca część analizy oparła się na ujęciach zaczynających się około 42. minuty tego nagrania (przykładowe klatki poniżej), założyliśmy więc:
 \begin{itemize}
 \item statyczną kamerę
 \item mniej więcej stałą wielkość (procentową względem całości kadru) narciarza
@@ -52,7 +52,7 @@ W pierwszej części realizacji projektu skupiliśmy się na kadrach widocznych 
 Prace wykonane w celu stworzenia aplikacji realizującej wspomniany cel można podzielić na kilka segmentów:
 \begin{enumerate}
 \item \textbf{Implementacja algorytmów przetwarzania wideo} – zgodnie z założeniami, zaimplementowane zostały dwie metody – metoda oparta na różnicach między kolejnymi klatkami oraz metoda naiwna oparta na wykrywaniu ciemnych plam na kolejnych klatkach nagrania. Więcej o zaimplementowanych metodach w sekcji \textit{\ref{sec:Methods} Zaimplementowane metody}
-\item \textbf{Eksport danych} – w celu zobrazowania efektów działania algorytmów, w programie dodane zostało okno podglądu umożliwiające analizę nagrania na bieżąco, jak również zaimplementowane zostały różne metody eksportu, pozwalające wybrać użytkownikowi interesujący go efekt dla całego nagrania, bądź też jego części. Tak też dostępne opcje eksportu to:
+\item \textbf{Eksport danych} – w celu zobrazowania efektów działania algorytmów, w programie dodane zostało okno podglądu umożliwiające analizę nagrania na bieżąco, jak również zaimplementowane zostały różne metody eksportu, pozwalające użytkownikowi wybrać interesujący go efekt dla całego nagrania, bądź też jego części. Tak też dostępne opcje eksportu to:
 \begin{itemize}
 \item Obecna klatka z podglądu wideo wraz z zaznaczonymi narciarzami
 \item Wideo z zaznaczonymi narciarzami  z możliwością wyboru zakresu klatek
@@ -64,7 +64,7 @@ Prace wykonane w celu stworzenia aplikacji realizującej wspomniany cel można p
   \includegraphics[width=0.4\linewidth]{resources/img4.png}
   \caption{Okno eksportu}
 \end{figure}
-\item \textbf{Budowa aplikacji} – dużym wyzwaniem było stworzenie aplikacji oferującej wspomniane funkcjonalności w optymalnym czasie, była to również najbardziej czasochłonna część projektu jednak efekty pozwalają na względnie komfortowe korzystanie z metod nawet niezaawansowanym użytkownikom
+\item \textbf{Budowa aplikacji} – dużym wyzwaniem było stworzenie aplikacji oferującej wspomniane funkcjonalności w optymalnym czasie, była to również najbardziej czasochłonna część projektu, jednak efekty pozwalają na względnie komfortowe korzystanie z metod nawet niezaawansowanym użytkownikom
 \end{enumerate}
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{resources/img5.png}
@@ -96,7 +96,7 @@ Aplikacja została wykonana w języku \textit{C\#} w technologii \textit{WPF}, z
 
 \subsubsection{Metoda background subtractingu ze średnią klatką}
 Metoda ta do porównywania wykorzystuje średnią z określonej liczby klatek pobieranych z filmu. Każdy piksel średniego obrazka jest otrzymywany przez zsumowanie składowych RGB z wszystkich odpowiadających mu pikseli z klatek, podzieleniu sumy przez ilość klatek i obcięcie do części całkowitych. Liczenie średniej odbywa się równolegle. Następnie średnia porównywana jest z daną klatką. Jeżeli różnica pomiędzy wartościami składowymi piksela na średniej klatce i na rozpatrywanej jest większa niż zadana tolerancja (threshold), to piksel jest zaznaczany na biało, w przeciwnym razie na czarno. Następnie na wynikowym obrazie uruchamiany jest algorytm detekcji tzw. blobów (białych obszarów) z dobranymi parametrami (rozmiar, okrągłość).
-Schemat działania:
+Schemat działania prezentuje się więc następująco:
 \begin{enumerate}
 \item Obliczenie średniej
 \item Pobranie klatki do porównania
@@ -108,7 +108,7 @@ Schemat działania:
 Metoda z tłem ma bardzo podobny schemat działania jak metoda ze średnią, jednak zamiast średniej, wykorzystywane jest w niej tło które dodajemy w aplikacji za pomocą przycisku.
 
 \subsubsection{Metoda naiwna}
-Metoda naiwna pozwala na względne oszacowanie liczby narciarzy na stoku, jednak nie jest mniej dokładna niż metody wykorzystujące średnia z tła filmu. Wymaga ona również dobierania parametrów na bieżąco w celu uzyskania rezultatów najbardziej zbliżonych do rzeczywistych wartości. Wydajność metody jest podobna do pozostałych metod. Działanie metody naiwnej:
+Metoda naiwna pozwala na względne oszacowanie liczby narciarzy na stoku, jednak jest mniej dokładna niż metody wykorzystujące średnia z tła filmu. Wymaga ona również dobierania parametrów na bieżąco w celu uzyskania rezultatów najbardziej zbliżonych do rzeczywistych wartości. Wydajność metody jest podobna do pozostałych metod. Działanie metody naiwnej:
 \begin{enumerate}
 \item Pobranie klatki do analizy.
 \item Konwersja klatki do przestrzeni barw HSV.
@@ -119,8 +119,8 @@ Metoda naiwna pozwala na względne oszacowanie liczby narciarzy na stoku, jednak
 \section{Eksperymenty}
 W trakcie implementowania rozwiązania, przeprowadziliśmy kilka eksperymentów mających na celu przybliżenie nas do osiągnięcia oczekiwanego rezultatu. Niestety najważniejsze z nich zakończyły się porażką.\\
 W początkach implementacji metody naiwnej podjęta została próba bez wykorzystania konwersji do przestrzeni barw HSV.  Efektem była zdecydowanie mniejsza dokładność metody oraz losowe punkty z otoczenia miały większy udział w liczbie wykrytych narciarzy. Z tego powodu w finalnej wersji owa konwersja została wprowadzona. Szczęśliwie nie miała ona znacznego wpływu na szybkość działania algorytmu.\\
-Innym istotnym podejściem była próba użycia wektorów ruchu wykorzystywanych w kompresji MPEG. Niestety, jak się okazało, nie istnieje żadna metoda dostępna dla platformy \textit{.NET} umożliwiająca odzyskanie tych wektorów. Żaden z dostępnych wrapperów na \textit{FFMPEG} nie udostępnia tej funkcji mimo iż wspomniany \textit{FFMPEG} daje taką możliwość. Z tego powodu zrezygnowaliśmy z implementacji tej metody. \\
-Kolejnym eksperymentem, wykraczającym poza przyjęte założenia, było przetestowanie metody dla nagrania stoku z kamery umieszczonej na kasku zjeżdżającego narciarza. Dało ono zaskakująco dobre przybliżenie liczby osób znajdujących się w polu widzenia. Niestety momentami duża część zliczeń pochodziła z tła jednak jest to zrozumiały efekt zważywszy na to, że obraz nie jest statyczny. Nagranie to wymagało również zwiększenia thresholdu (przedstawione na poniższych zdjęciach 6, 7).
+Innym istotnym podejściem była próba użycia wektorów ruchu wykorzystywanych w kompresji MPEG. Niestety, jak się okazało, nie istnieje żadna metoda dostępna dla platformy \textit{.NET} umożliwiająca odzyskanie tych wektorów. Żaden z dostępnych wrapperów na \textit{FFMPEG} nie udostępnia tej funkcji, mimo iż wspomniany \textit{FFMPEG} daje taką możliwość. Z tego powodu zrezygnowaliśmy z implementacji tej metody. \\
+Kolejnym eksperymentem, wykraczającym poza przyjęte założenia, było przetestowanie metody dla nagrania stoku z kamery umieszczonej na kasku zjeżdżającego narciarza. Dało ono zaskakująco dobre przybliżenie liczby osób znajdujących się w polu widzenia. Niestety momentami duża część zliczeń pochodziła z tła, jednak jest to zrozumiały efekt zważywszy na to, że obraz nie jest statyczny. Nagranie to wymagało również zwiększenia thresholdu (przedstawione na poniższych zdjęciach 6, 7).
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{resources/img6.png}
   \caption{Analiza dla nagrania z kasku zjeżdżającego narciarza}
@@ -132,9 +132,9 @@ Kolejnym eksperymentem, wykraczającym poza przyjęte założenia, było przetes
 
 \section{Ocena efektów}
 Pomimo iż aplikacja została ukończona, uważamy, że postawione przez nas cele nie zostały osiągnięte w stopniu satysfakcjonującym.\\
-Aplikacja z powodu konieczności obliczania średniej ze znacznej ilości klatek  przy głównej metodzie nie działa tak płynnie jak z początku zakładaliśmy, jednak na tyle płynnie, że jest to akceptowalna w odbiorze prędkość. Na płynność odtwarzania istotny wpływ ma fakt, że potrzebna jest ekstrakcja kolejnych klatek filmu oraz ich przetworzenie.\\
-Metoda \textit{background subtractingu}, tak jak oczekiwaliśmy, okazała się  być najlepszym wyborem spośród zaimplementowanych przez nas podejść, jednak ona również posiada widoczne mankamenty przy stosowaniu jej w naszym programie. Jest tak głównie ze względu na dodatkowe obiekty takie jak kamienie lub drzewa, które mogą znajdować się na stoku poza narciarzami i śniegiem, a mogą zostać omyłkowo wzięte za narciarza. Co prawda aplikacja pozwala na manipulowanie opcjami wykrywania, jednak ich możliwości również są ograniczone, a dodatkowo konieczność ingerencji użytkownika, demaskuje wady tej metody.\\
-Niestety nie udało się również osiągnąć oczekiwanych rezultatów w kwestii czasu działania aplikacji. Tempo przetwarzania około 10 klatek na sekundę było co prawda przewidywalne, jednak dla filmu o 24 klatkach na sekundę, daje to czas przetwarzania 2.5 razy większy od czasu właściwego filmu. Stąd też analiza jednego dnia na stoku (7h), zajęłaby naszemu algorytmowi całą dobę.
+Aplikacja z powodu konieczności obliczania średniej ze znacznej ilości klatek  przy głównej metodzie nie działa tak płynnie jak z początku zakładaliśmy (osiąga poniżej 10 klatek na sekundę), jednak na tyle płynnie, że jest to akceptowalna w odbiorze prędkość. Na płynność odtwarzania istotny wpływ ma fakt, że potrzebna jest ekstrakcja kolejnych klatek filmu oraz ich przetworzenie.\\
+Metoda \textit{background subtractingu}, tak jak oczekiwaliśmy, okazała się  być najlepszym wyborem spośród zaimplementowanych przez nas podejść, jednak ona również posiada widoczne mankamenty przy stosowaniu jej w naszym programie. Dzieje się tak głównie ze względu na dodatkowe obiekty takie jak kamienie lub drzewa, które mogą znajdować się na stoku poza narciarzami i śniegiem, a mogą zostać omyłkowo wzięte za narciarza. Co prawda aplikacja pozwala na manipulowanie opcjami wykrywania, jednak ich możliwości również są ograniczone, a dodatkowo konieczność ingerencji użytkownika, demaskuje wady tej metody.\\
+Niestety płynność działania aplikacji przekreśla możliwość używania jej na większą skalę niż uczelniany projekt. Tempo przetwarzania około 10 klatek na sekundę było co prawda przewidywane, jednak dla filmu o 24 klatkach na sekundę, daje to czas przetwarzania 2.5 razy większy od czasu właściwego filmu. Stąd też analiza jednego dnia na stoku (7h), zajęłaby naszemu algorytmowi całą dobę. Jest to czas nieakceptowalny dla przeciętnego użytkownika.
 
 \section{Wnioski}
 Zastosowana w projekcie analiza poklatkowa wideo okazała się metodą niezwykle zasobochłonną. Pamięć RAM wykorzystywana przez program niemal nieustannie osiągała maksimum udostępnione przez system. Narzut wynikający z zastosowanej technologii również wpływał negatywnie na osiągi programu. Jasno narzuca się zatem wniosek, iż wybierając wspomnianą technologię, w zamian za nie najwyższy poziom skomplikowania implementacyjnego, ponieśliśmy koszty w kwestii osiągów programu. Interesującą szansą usprawnienia aplikacji jest wykorzystanie obliczeń wspomaganych przez procesory graficzne dla operacji na mapach bitowych.\\
