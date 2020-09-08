@@ -11,6 +11,9 @@ namespace SkiSlopeMotionDetection
         public bool AddFrameToAverage { get; set; } = false;
         public int DifferenceThreshold { get; set; } = 30;
 
+        public int HueHSV { get; set; } = 0;
+        public int SaturationHSV { get; set; } = 0;
+        public int ValueHSV { get; set; } = 130;
 
         public Bitmap AverageBitmap { get; set; }
         public Bitmap BackgroundBitmap { get; set; }
