@@ -117,6 +117,7 @@
     <Compile Include="AverageFrameSingleton.cs" />
     <Compile Include="BlobDetection.cs" />
     <Compile Include="BlobDetectionParameters.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="EmguBlobDetectionOptions.cs" />
     <Compile Include="DetectionMethod.cs" />
     <Compile Include="ExtensionMethods.cs" />
@@ -126,6 +127,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PresentationLayer\ExportMode.cs" />
     <Compile Include="PresentationLayer\ExportProgressWindow.xaml.cs">
       <DependentUpon>ExportProgressWindow.xaml</DependentUpon>
     </Compile>
@@ -147,6 +149,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PresentationLayer\TimeSpan.cs" />
     <Compile Include="Processing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

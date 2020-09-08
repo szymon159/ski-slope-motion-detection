@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -22,35 +23,36 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         private ExportProgressWindow _exportProgressWindow;
         private BlobDetectionParameters _blobDetectionParameters;
 
-        #endregion
+        #endregion Private variables
 
         #region Properties
 
-        public ExportSettings ExportSettings 
-        { 
+        public ExportSettings ExportSettings
+        {
             get { return _settings; }
             set { _settings = value; NotifyPropertyChanged(); }
         }
 
-        #endregion
+        #endregion Properties
 
         #region Event handlers
 
         public event PropertyChangedEventHandler PropertyChanged;
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
+        #endregion Event handlers
 
         #region Public methods
 
-        public ExportWindow(BlobDetectionParameters blobDetectionParameters, bool exportEntireVideo = false, bool includeMarking = true)
+        public ExportWindow(BlobDetectionParameters blobDetectionParameters, ExportMode exportMode = ExportMode.CurrentFrame, bool includeMarking = true)
         {
-            InitializeComponent();
+            ExportSettings = new ExportSettings(exportMode, includeMarking);
 
-            ExportSettings = new ExportSettings(exportEntireVideo, includeMarking);
+            InitializeComponent();
 
             _blobDetectionParameters = blobDetectionParameters;
 
@@ -59,35 +61,45 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 WorkerSupportsCancellation = true,
                 WorkerReportsProgress = true
             };
-            _exportWorker.DoWork += ExportWorker_DoWork;
             _exportWorker.RunWorkerCompleted += ExportWorker_RunWorkerCompleted;
             _exportWorker.ProgressChanged += ExportWorker_ProgressChanged;
         }
 
-        #endregion
+        #endregion Public methods
 
         #region Private methods
 
-        private void ExportWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void ExportWorker_DoWorkVideo(object sender, DoWorkEventArgs e)
         {
             var outputFileName = e.Argument as string;
             var reader = FrameReaderSingleton.GetInstance();
+
+            (int first, int last) = GetFirstAndLastFrameNumber((int)reader.FrameCount);
+            int totalFrames = last - first;
 
             using (var writer = new VideoFileWriter())
             {
                 writer.Open(outputFileName, reader.FrameWidth, reader.FrameHeight, new Rational(reader.FrameRate), VideoCodec.Default);
                 if (!writer.IsOpen)
                     throw new ArgumentException("Unable to open file for writing");
-               
-                for (int i = 0; i < reader.FrameCount; i++)
+
+                for (int i = first; i < last; i++)
                 {
                     if (_exportWorker.CancellationPending)
                         break;
 
                     Bitmap frame = reader.GetFrame(i);
 
-                    if(ExportSettings.IncludeMarking)
+                    if (ExportSettings.IncludeMarking)
                     {
+                        if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                        {
+                            if (i % Globals.AverageFrequency == first % Globals.AverageFrequency)
+                            {
+                                _blobDetectionParameters.AddFrameToAverage = true;
+                            }
+                        }
+
                         // Hack to prevent from deep copy of _blobDetectionParameters
                         var temp = _blobDetectionParameters.MarkBlobs;
 
@@ -98,7 +110,64 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                     writer.WriteVideoFrame(frame);
 
-                    var progress = 100 * i / (double)reader.FrameCount;
+                    var progress = 100 * i / (double)totalFrames;
+                    _exportWorker.ReportProgress((int)progress);
+                }
+            }
+        }
+
+        private void ExportWorker_DoWorkStats(object sender, DoWorkEventArgs e)
+        {
+            var outputFileName = e.Argument as string;
+            var reader = FrameReaderSingleton.GetInstance();
+
+            (int first, int last) = GetFirstAndLastFrameNumber((int)reader.FrameCount);
+            int framesForAverage = GetFramesForAverageCount((int)Math.Round(reader.FrameRate));
+            int totalFrames = last - first;
+
+            double peopleSum = 0;
+            int frameCount = 0;
+            int firstFrame = first;
+
+            using (var writer = new StreamWriter(outputFileName))
+            {
+                if (writer == null)
+                    throw new ArgumentException("Unable to open file for writing");
+
+                for (int i = first; i < last; i++)
+                {
+                    if (_exportWorker.CancellationPending)
+                        break;
+
+                    if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                    {
+                        if (i % Globals.AverageFrequency == first % Globals.AverageFrequency)
+                        {
+                            _blobDetectionParameters.AddFrameToAverage = true;
+                        }
+                    }
+
+                    Bitmap frame = reader.GetFrame(i);
+                    BlobDetection.GetResultImage(frame, _blobDetectionParameters, out int peopleInFrame);
+
+                    if (i % framesForAverage == 0 && i != 0)
+                    {
+                        writer.WriteLine($"{ExportSettings.TimeSpan} {i / framesForAverage} (frames {i - frameCount} - {i - 1}): {peopleSum / frameCount} people in average");
+
+                        peopleSum = 0;
+                        frameCount = 0;
+                        firstFrame = i;
+                    }
+
+                    peopleSum += peopleInFrame;
+                    frameCount++;
+
+                    if (i == last - 1 && (i % framesForAverage != 0 || i == 0))
+                    {
+                        writer.WriteLine($"{ExportSettings.TimeSpan} {i / framesForAverage + 1} (frames {i - frameCount + 1} - {i}): {peopleSum / frameCount} people in average");
+                    }
+
+                    var progress = 100 * i / (double)totalFrames;
                     _exportWorker.ReportProgress((int)progress);
                 }
             }
@@ -121,30 +190,68 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var videoFilter = 
-                "MP4 video file (*.mp4)|*.mp4|" +
-                "Audio Video Interleave (*.avi)|*.avi";
-            
-            var imageFilter = 
-                "Bitmap (*.bmp)|*.bmp|" +
-                "Graphics Interchange Format (*.gif)|*.gif|" +
-                "Exchangeable Image File Format (*.exif)|*.exif|" +
-                "JPEG Image (*.jpg)|*.jpg|" +
-                "Portable Network Graphics (*.png)|*.png|" +
-                "Tagged Image File Format (*.tiff)|*.tiff";
+            string filter = "All files (*.*)|*.*";
+            switch (ExportSettings.ExportMode)
+            {
+                case ExportMode.CurrentFrame:
+                    filter =
+                        "Bitmap (*.bmp)|*.bmp|" +
+                        "Graphics Interchange Format (*.gif)|*.gif|" +
+                        "Exchangeable Image File Format (*.exif)|*.exif|" +
+                        "JPEG Image (*.jpg)|*.jpg|" +
+                        "Portable Network Graphics (*.png)|*.png|" +
+                        "Tagged Image File Format (*.tiff)|*.tiff";
+                    break;
+
+                case ExportMode.EntireVideo:
+                    filter =
+                        "MP4 video file (*.mp4)|*.mp4|" +
+                        "Audio Video Interleave (*.avi)|*.avi";
+                    break;
+
+                case ExportMode.Stats:
+                    filter =
+                        "Text file (*.txt)|*.txt";
+                    break;
+
+                case ExportMode.Histogram:
+                    filter =
+                        "Portable Network Graphics (*.png)|*.png|";
+                    break;
+
+                default:
+                    break;
+            }
 
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = ExportSettings.ExportEntireVideo ? videoFilter : imageFilter,
+                Filter = filter,
                 InitialDirectory = Environment.CurrentDirectory
             };
 
             if (saveFileDialog.ShowDialog() == true)
             {
-                if (ExportSettings.ExportSelectedFrame)
-                    ExportFrame(saveFileDialog.FileName);
-                else
-                    ExportVideo(saveFileDialog.FileName);
+                switch (ExportSettings.ExportMode)
+                {
+                    case ExportMode.CurrentFrame:
+                        ExportFrame(saveFileDialog.FileName);
+                        break;
+
+                    case ExportMode.EntireVideo:
+                        ExportVideo(saveFileDialog.FileName);
+                        break;
+
+                    case ExportMode.Stats:
+                        ExportStats(saveFileDialog.FileName);
+                        break;
+
+                    case ExportMode.Histogram:
+                        ExportHistogram(saveFileDialog.FileName);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
 
@@ -154,16 +261,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 throw new ApplicationException("Unable to get current frame");
 
             var extension = Path.GetExtension(outputFileName);
-            Bitmap currentFrame;
+            var reader = FrameReaderSingleton.GetInstance();
+            var currentFrame = reader.GetFrame(mainWindow.CurrentFrameNumber);
 
-            if (!ExportSettings.IncludeMarking)
+            if (ExportSettings.IncludeMarking)
             {
-                var reader = FrameReaderSingleton.GetInstance();
-                currentFrame = reader.GetFrame(mainWindow.CurrentFrameNumber);
-            }
-            else
-            {
-                currentFrame = mainWindow.CurrentFrame;
+                // Hack to prevent from deep copy of _blobDetectionParameters
+                var temp = _blobDetectionParameters.MarkBlobs;
+
+                _blobDetectionParameters.MarkBlobs = true;
+                currentFrame = BlobDetection.GetResultImage(currentFrame, _blobDetectionParameters, out _);
+                _blobDetectionParameters.MarkBlobs = temp;
             }
 
             currentFrame.Save(outputFileName, extension.ToImageFormat());
@@ -178,11 +286,68 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 Owner = GetWindow(this)
             };
 
+            _exportWorker.DoWork += ExportWorker_DoWorkVideo;
             _exportWorker.RunWorkerAsync(outputFileName);
-            if(_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+            if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
                 _exportWorker.CancelAsync();
         }
 
-        #endregion
+        private void ExportStats(string outputFileName)
+        {
+            _exportProgressWindow = new ExportProgressWindow
+            {
+                Owner = GetWindow(this)
+            };
+
+            _exportWorker.DoWork += ExportWorker_DoWorkStats;
+            _exportWorker.RunWorkerAsync(outputFileName);
+            if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+                _exportWorker.CancelAsync();
+        }
+
+        private void ExportHistogram(string outputFileName)
+        {
+
+        }
+
+        private (int first, int last) GetFirstAndLastFrameNumber(int frameCount)
+        {
+            int first = 0, last = 0;
+            if (!ExportSettings.FirstFrame.HasValue)
+                first = 0;
+            if (!ExportSettings.LastFrame.HasValue)
+                last = frameCount;
+            if (ExportSettings.FirstFrame.HasValue && ExportSettings.LastFrame.HasValue)
+            {
+                first = ExportSettings.FirstFrame.Value;
+                if (first < 0)
+                    first = 0;
+                if (first >= frameCount)
+                    first = frameCount - 1;
+                last = ExportSettings.LastFrame.Value;
+                if (last < 0)
+                    last = 0;
+                if (last > frameCount)
+                    last = frameCount;
+            }
+            return (first, last);
+        }
+
+        private int GetFramesForAverageCount(int frameRate)
+        {
+            switch (ExportSettings.TimeSpan)
+            {
+                case TimeSpan.Second:
+                    return frameRate;
+                case TimeSpan.Minute:
+                    return 60 * frameRate;
+                case TimeSpan.Hour:
+                    return 3600 * frameRate;
+                default:
+                    return frameRate;
+            }
+        }
+
+        #endregion Private methods
     }
 }
