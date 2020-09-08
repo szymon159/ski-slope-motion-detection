@@ -11,6 +11,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
         CurrentFrame,
         EntireVideo,
         Stats,
-        Histogram
+        Heatmap
     }
 }

@@ -1,13 +1,17 @@
 ﻿using Accord.Math;
 using Accord.Video.FFMPEG;
 using Microsoft.Win32;
+using OxyPlot;
+using OxyPlot.Annotations;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
@@ -127,7 +131,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
             double peopleSum = 0;
             int frameCount = 0;
-            int firstFrame = first;
 
             using (var writer = new StreamWriter(outputFileName))
             {
@@ -156,7 +159,6 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                         peopleSum = 0;
                         frameCount = 0;
-                        firstFrame = i;
                     }
 
                     peopleSum += peopleInFrame;
@@ -171,6 +173,58 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     _exportWorker.ReportProgress((int)progress);
                 }
             }
+        }
+
+        private void ExportWorker_DoWorkHeatmap(object sender, DoWorkEventArgs e)
+        {
+            var outputFileName = e.Argument as string;
+            var reader = FrameReaderSingleton.GetInstance();
+
+            (int first, int last) = GetFirstAndLastFrameNumber((int)reader.FrameCount);
+            int totalFrames = last - first;
+
+            var heatmap = new Heatmap(reader.FrameWidth, reader.FrameHeight);
+
+            for (int i = first; i < last; i++)
+            {
+                if (_exportWorker.CancellationPending)
+                    break;
+
+                if (_blobDetectionParameters.DetectionMethod == DetectionMethod.DiffWithAverage)
+                {
+                    if (i % Globals.AverageFrequency == first % Globals.AverageFrequency)
+                    {
+                        _blobDetectionParameters.AddFrameToAverage = true;
+                    }
+                }
+
+                Bitmap frame = reader.GetFrame(i);
+                _blobDetectionParameters.GetKeyPoints = true;
+                BlobDetection.GetResultImage(frame, _blobDetectionParameters, out _, out Emgu.CV.Structure.MKeyPoint[] mKeys);
+                _blobDetectionParameters.GetKeyPoints = true;
+
+                heatmap.UpdateSeries(mKeys);
+
+                var progress = 100 * i / (double)totalFrames;
+                _exportWorker.ReportProgress((int)progress);
+            }
+
+            ImageConverter converter = new ImageConverter();
+            heatmap.HeatMap.Annotations.Add(new ImageAnnotation
+            {
+                ImageSource = new OxyImage((byte[])converter.ConvertTo(reader.GetFrame(1), typeof(byte[]))),
+                Opacity = 0.2,
+                X = new PlotLength(0.5, PlotLengthUnit.RelativeToPlotArea),
+                Y = new PlotLength(0.5, PlotLengthUnit.RelativeToPlotArea),
+                Width = new PlotLength(1, PlotLengthUnit.RelativeToPlotArea),
+                Height = new PlotLength(1, PlotLengthUnit.RelativeToPlotArea)
+            }); ;
+            heatmap.HeatMap.InvalidatePlot(true);
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (SendOrPostCallback)delegate
+            { 
+                heatmap.SaveToFile(outputFileName);
+            }, null);
         }
 
         private void ExportWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -214,9 +268,9 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                         "Text file (*.txt)|*.txt";
                     break;
 
-                case ExportMode.Histogram:
+                case ExportMode.Heatmap:
                     filter =
-                        "Portable Network Graphics (*.png)|*.png|";
+                        "Portable Network Graphics (*.png)|*.png";
                     break;
 
                 default:
@@ -245,8 +299,8 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                         ExportStats(saveFileDialog.FileName);
                         break;
 
-                    case ExportMode.Histogram:
-                        ExportHistogram(saveFileDialog.FileName);
+                    case ExportMode.Heatmap:
+                        ExportHeatmap(saveFileDialog.FileName);
                         break;
 
                     default:
@@ -305,9 +359,17 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 _exportWorker.CancelAsync();
         }
 
-        private void ExportHistogram(string outputFileName)
+        private void ExportHeatmap(string outputFileName)
         {
+            _exportProgressWindow = new ExportProgressWindow
+            {
+                Owner = GetWindow(this)
+            };
 
+            _exportWorker.DoWork += ExportWorker_DoWorkHeatmap;
+            _exportWorker.RunWorkerAsync(outputFileName);
+            if (_exportProgressWindow.ShowDialog() == false && _exportWorker.IsBusy)
+                _exportWorker.CancelAsync();
         }
 
         private (int first, int last) GetFirstAndLastFrameNumber(int frameCount)

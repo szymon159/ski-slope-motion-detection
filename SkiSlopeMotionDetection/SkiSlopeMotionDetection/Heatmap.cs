@@ -1,45 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OxyPlot;
-using OxyPlot.Series;
 using OxyPlot.Axes;
 using Emgu.CV.Structure;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using OxyPlot.Wpf;
 using HeatMapSeries = OxyPlot.Series.HeatMapSeries;
 
 namespace SkiSlopeMotionDetection.PresentationLayer
 {
-    public class Heatmap : INotifyPropertyChanged
+    public class Heatmap
     {
-        private PlotModel heatMap;
-        public PlotModel HeatMap
-        {
-            get { return heatMap; }
-            set { heatMap = value; NotifyPropertyChanged(); }
-        }
-
-        public string Title
-        {
-            get { return heatMap.Title; }
-            set { heatMap.Title = value; }
-        }
-
-        private OxyPlot.Series.HeatMapSeries series;
-
-        public OxyPlot.Series.HeatMapSeries Series
-        {
-            get { return series; }
-            set { series = value; NotifyPropertyChanged(); }
-        }
+        public PlotModel HeatMap { get; set; }
+        public HeatMapSeries Series { get; set; }
 
         public Heatmap(int width, int height)
         {
-            heatMap = new PlotModel
+            HeatMap = new PlotModel
             {
                 Title = "Areas used by skiers",
                 PlotType = PlotType.XY,
@@ -47,7 +23,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                 IsLegendVisible = false,
             };
 
-            Series = new OxyPlot.Series.HeatMapSeries
+            Series = new HeatMapSeries
             {
                 Title = "HMSeries",
                 Interpolate = true,
@@ -58,19 +34,19 @@ namespace SkiSlopeMotionDetection.PresentationLayer
             };
 
             Series.Data = new double[width, height];
-            heatMap.Series.Add(Series);
+            HeatMap.Series.Add(Series);
 
-            heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
             {
                 Position = AxisPosition.Left,
                 IsAxisVisible = false
             });
-            heatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearAxis()
             {
                 Position = AxisPosition.Bottom,
                 IsAxisVisible = false
             });
-            heatMap.Axes.Add(new OxyPlot.Axes.LinearColorAxis
+            HeatMap.Axes.Add(new OxyPlot.Axes.LinearColorAxis
             {
                 Position = AxisPosition.Right,
                 IsAxisVisible = false,
@@ -80,46 +56,44 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
         public void UpdateSeries(MKeyPoint[] keyPoints)
         {
-            int blobrange;
-            for(int i=0; i<keyPoints.Count(); i++)
+            int blobRange;
+            for (int i = 0; i < keyPoints.Count(); i++)
             {
-                blobrange = (int)keyPoints[i].Size / 2;
-                for(int j=0; j<blobrange+1; j++)
+                blobRange = (int)keyPoints[i].Size / 2;
+                for (int j = 0; j < blobRange + 1; j++)
                 {
-                    for (int k = 0; k < blobrange+1; k++)
+                    for (int k = 0; k < blobRange + 1; k++)
                     {
-                        double dist = Math.Sqrt(Math.Pow(-blobrange + j + k, 2) + Math.Pow(-j + k, 2));
-                        double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
-                        if (keyPoints[i].Point.X - blobrange + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
-                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobrange + j + k < 0) continue;
-                        Series.Data[(int)keyPoints[i].Point.X - blobrange + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                        double dist = Math.Sqrt(Math.Pow(-blobRange + j + k, 2) + Math.Pow(-j + k, 2));
+                        double val = (blobRange + 1.0 - dist) / (blobRange + 1.0);
+                        if (keyPoints[i].Point.X - blobRange + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1))
+                            break;
+                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobRange + j + k < 0)
+                            continue;
+                        Series.Data[(int)keyPoints[i].Point.X - blobRange + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
                     }
                 }
-                for (int j = 0; j < blobrange; j++)
+                for (int j = 0; j < blobRange; j++)
                 {
-                    for (int k = 0; k < blobrange; k++)
+                    for (int k = 0; k < blobRange; k++)
                     {
-                        double dist = Math.Sqrt(Math.Pow(-blobrange +1 + j + k, 2) + Math.Pow(-j + k, 2));
-                        double val = (blobrange + 1.0 - dist) / (blobrange + 1.0);
-                        if (keyPoints[i].Point.X - blobrange +1 + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) break;
-                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobrange +1 + j + k < 0) continue;
-                        Series.Data[(int)keyPoints[i].Point.X - blobrange +1 + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                        double dist = Math.Sqrt(Math.Pow(-blobRange + 1 + j + k, 2) + Math.Pow(-j + k, 2));
+                        double val = (blobRange + 1.0 - dist) / (blobRange + 1.0);
+                        if (keyPoints[i].Point.X - blobRange + 1 + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) 
+                            break;
+                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobRange + 1 + j + k < 0)
+                            continue;
+                        Series.Data[(int)keyPoints[i].Point.X - blobRange + 1 + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
                     }
                 }
             }
-            heatMap.InvalidatePlot(true);
+            HeatMap.InvalidatePlot(true);
         }
 
-        public void saveToFile (string path)
+        public void SaveToFile(string path)
         {
             var pngExporter = new PngExporter { Width = 1200, Height = 800, Background = OxyColors.White };
             pngExporter.ExportToFile(HeatMap, path);
         }
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
     }
 }

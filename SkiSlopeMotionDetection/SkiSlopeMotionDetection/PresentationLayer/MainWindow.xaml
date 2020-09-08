@@ -212,7 +212,6 @@
                                     Value="{Binding DifferenceThreshold}"/>
                     </Grid>
                 </GroupBox>
-                <Button Content="Test" Click="TestButton_Click"  HorizontalAlignment="Left" Height="25" Margin="10,20,0,0" Grid.Row="1" VerticalAlignment="Top" Width="50"/>
             </Grid>
         </Grid>
     </DockPanel>
