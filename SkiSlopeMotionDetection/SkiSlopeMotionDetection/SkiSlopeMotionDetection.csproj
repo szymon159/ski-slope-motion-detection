@@ -105,6 +105,7 @@
     <Compile Include="AverageFrameSingleton.cs" />
     <Compile Include="BlobDetection.cs" />
     <Compile Include="BlobDetectionParameters.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="EmguBlobDetectionOptions.cs" />
     <Compile Include="DetectionMethod.cs" />
     <Compile Include="ExtensionMethods.cs" />
