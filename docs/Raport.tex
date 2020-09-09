@@ -3,8 +3,11 @@
 \usepackage{hyperref}
 \usepackage[margin=1.1in]{geometry}
 \usepackage{graphicx}
+\usepackage{biblatex}
 \usepackage{float}
 \renewcommand{\figurename}{Zdjęcie}
+
+\addbibresource{bibliography.bib}
 
 \title{Określanie ilości osób na stoku narciarskim na podstawie nagrań wideo, w celu określenia obciążenia trasy\\
 \small \url{https://github.com/szymon159/ski-slope-motion-detection}}
@@ -83,7 +86,7 @@ Aplikacja została wykonana w języku \textit{C\#} w technologii \textit{WPF}, z
 \subsection{Zaimplementowane metody}
 \label{sec:Methods}
 \begin{enumerate}
-\item \textbf{Detekcja i śledzenie ruchu używając obrazu tła i różnic między kolejnymi klatkami materiału wideo} (\textit{Motion Detection and Tracking using Background Subtraction and Consecutive Frames Difference Method})
+\item \textbf{Detekcja i śledzenie ruchu używając obrazu tła i różnic między kolejnymi klatkami materiału wideo} (\textit{Motion Detection and Tracking using Background Subtraction and Consecutive Frames Difference Method} \cite{1})
 	\begin{enumerate}
 	\item Obraz tła uzyskany jako średnia z wielu klatek nagrania
 	\item Obraz tła (pusty stok) wgrany z pliku
@@ -173,5 +176,7 @@ Niestety płynność działania aplikacji przekreśla możliwość używania jej
 Zastosowana w projekcie analiza poklatkowa wideo okazała się metodą niezwykle zasobochłonną. Pamięć RAM wykorzystywana przez program niemal nieustannie osiągała maksimum udostępnione przez system. Narzut wynikający z zastosowanej technologii również wpływał negatywnie na osiągi programu. Jasno narzuca się zatem wniosek, iż wybierając wspomnianą technologię, w zamian za niższy poziom skomplikowania implementacyjnego oraz wykorzystanie znanego nam frameworka do tworzenia GUI, ponieśliśmy koszty w kwestii osiągów programu. Interesującą szansą usprawnienia aplikacji jest wykorzystanie obliczeń wspomaganych przez procesory graficzne dla operacji na mapach bitowych.\\
 Ponadto zdaliśmy sobie sprawę, że przyjęta przez nas metodyka nie była w stu procentach poprawna. Z racji, że postawiliśmy sobie za cel zbadanie możliwości naszych metod, momentami zamiast dobierać odpowiednie metody do funkcjonalności, modyfikowaliśmy funkcjonalność by pasowała do naszych metod. Jest to ważna lekcja na przyszłość i następnym razem przy rozwiązywaniu podobnego problemu, przyjęlibyśmy inne podejście.
 
-\end{document}
+\newpage
+\printbibliography
 
+\end{document}
