@@ -66,11 +66,16 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     {
                         double dist = Math.Sqrt(Math.Pow(-blobRange + j + k, 2) + Math.Pow(-j + k, 2));
                         double val = (blobRange + 1.0 - dist) / (blobRange + 1.0);
-                        if (keyPoints[i].Point.X - blobRange + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1))
+
+                        int indexX = (int)keyPoints[i].Point.X - blobRange + j + k;
+                        int indexY = Series.Data.GetLength(1) - (int)keyPoints[i].Point.Y - j + k + 1;
+                        
+
+                        if (indexX > Series.Data.GetLength(0) || indexY > Series.Data.GetLength(1))
                             break;
-                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobRange + j + k < 0)
+                        if (indexX < 0 || indexY < 0)
                             continue;
-                        Series.Data[(int)keyPoints[i].Point.X - blobRange + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                        Series.Data[indexX, indexY] += val;
                     }
                 }
                 for (int j = 0; j < blobRange; j++)
@@ -79,11 +84,14 @@ namespace SkiSlopeMotionDetection.PresentationLayer
                     {
                         double dist = Math.Sqrt(Math.Pow(-blobRange + 1 + j + k, 2) + Math.Pow(-j + k, 2));
                         double val = (blobRange + 1.0 - dist) / (blobRange + 1.0);
-                        if (keyPoints[i].Point.X - blobRange + 1 + j + k > Series.Data.GetLength(0) || keyPoints[i].Point.Y - j + k > Series.Data.GetLength(1)) 
+
+                        int indexX = (int)keyPoints[i].Point.X - blobRange + 1 + j + k;
+                        int indexY = Series.Data.GetLength(1) - (int)keyPoints[i].Point.Y - j + k + 1;
+                        if (indexX > Series.Data.GetLength(0) || indexY > Series.Data.GetLength(1))
                             break;
-                        if (keyPoints[i].Point.Y - j + k < 0 || keyPoints[i].Point.X - blobRange + 1 + j + k < 0)
+                        if (indexX < 0 || indexY < 0)
                             continue;
-                        Series.Data[(int)keyPoints[i].Point.X - blobRange + 1 + j + k, (int)keyPoints[i].Point.Y - j + k] += val;
+                        Series.Data[indexX, indexY] += val;
                     }
                 }
             }
