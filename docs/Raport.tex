@@ -72,7 +72,7 @@ Prace wykonane w celu stworzenia aplikacji realizującej wspomniany cel można p
 \end{figure}
 Wykonane prace można również podzielić według osób odpowiedzialnych za wspomniane segmenty. Podział ten prezentuje się następująco: 
 \begin{itemize}
-\item Michał - opracowanie naiwnej metody oraz jej przetestowanie, pomoc przy tworzeniu interfejsu graficznego, przygotowanie kontrolek odpowiedzialnych za parametryzację. Implementacja komponentu odpowiedzialnego za liczenie średniej z klatek filmu podczas jego odtwarzania. 
+\item Michał - opracowanie naiwnej metody oraz jej przetestowanie, pomoc przy tworzeniu interfejsu graficznego, przygotowanie kontrolek odpowiedzialnych za parametryzację, testowanie. Implementacja komponentu odpowiedzialnego za liczenie średniej z klatek filmu podczas jego odtwarzania. 
 \item Szymon – opracowanie interfejsu graficznego aplikacji, architektura, wczytywanie i eksport plików, ekstrakcja klatek. Implementacja własnego odtwarzacza wideo umożliwiającego operacje na osobnych klatkach wideo
 \item Przemysław - wstępna implementacja metody background subtractingu ze średnią, wybór i rozpoznanie technologii \textit{EmguCV}, mechanizm wyciągania średniej z n klatek, tworzenie heatmapy.
 \end{itemize}
@@ -131,7 +131,7 @@ Kolejnym eksperymentem, wykraczającym poza przyjęte założenia, było przetes
 \end{figure}
 
 \section{Wyniki}
-Jako zbiór testowy nagrań posłużyły nam wspomniane wcześniej 3 ujęcia tego samego stoku (zdjęcia 1, 2 oraz 3). Dla każdego z nagrań przeprowadziliśmy testy opierające się na eksporcie danych dla detekcji różnymi metodami a następnie na porównaniu otrzymanych rezultatów z wartością realną. Niestety, z powodu niemożności uzyskania sensownego obrazu tła dla ujęcia drugiego i trzeciego, pominięte zostały analizy metody z obrazem tła dla tych ujęć. Ponadto, w celu zoptymalizowania pracy, wartość realna liczona była wyłącznie co 10-15 sekund, stąd znaczne różnice w kształtach poniższych wykresów.\\
+Jako zbiór testowy nagrań posłużyły nam wspomniane wcześniej 3 ujęcia tego samego stoku (zdjęcia 1, 2 oraz 3). Dla każdego z nagrań przeprowadziliśmy testy opierające się na eksporcie danych dla detekcji różnymi metodami a następnie na porównaniu otrzymanych rezultatów z wartością realną. Niestety, z powodu niemożności uzyskania sensownego obrazu tła dla ujęcia drugiego i trzeciego, pominięte zostały analizy metody z obrazem tła dla tych ujęć. Ponadto, w celu zoptymalizowania pracy, wartość realna liczona była wyłącznie co kilkanaście sekund, stąd znaczne różnice w kształtach poniższych wykresów.\\
 \begin{figure}[H]
   \includegraphics[width=\linewidth]{resources/img8.png}
   \caption{Analiza dla ujęcia podstawowego}
