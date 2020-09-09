@@ -69,7 +69,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                         int indexX = (int)keyPoints[i].Point.X - blobRange + j + k;
                         int indexY = Series.Data.GetLength(1) - ((int)keyPoints[i].Point.Y - j + k) + 1;
-                        if (indexX > Series.Data.GetLength(0) || indexY > Series.Data.GetLength(1))
+                        if (indexX >= Series.Data.GetLength(0) || indexY >= Series.Data.GetLength(1))
                             break;
                         if (indexX < 0 || indexY < 0)
                             continue;
@@ -85,7 +85,7 @@ namespace SkiSlopeMotionDetection.PresentationLayer
 
                         int indexX = (int)keyPoints[i].Point.X - blobRange + 1 + j + k;
                         int indexY = Series.Data.GetLength(1) - ((int)keyPoints[i].Point.Y - j + k) + 1;
-                        if (indexX > Series.Data.GetLength(0) || indexY > Series.Data.GetLength(1))
+                        if (indexX >= Series.Data.GetLength(0) || indexY >= Series.Data.GetLength(1))
                             break;
                         if (indexX < 0 || indexY < 0)
                             continue;
